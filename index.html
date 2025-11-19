@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Pegawai</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --secondary: #f8fafc;
+            --accent: #60a5fa;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 25px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #0da271;
+        }
+
+        .dashboard {
+            display: none;
+            width: 100%;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-right: 20px;
+        }
+
+        .user-details h2 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: var(--text-light);
+            margin-bottom: 3px;
+        }
+
+        .attendance-card {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .time-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .location-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            color: var(--text-light);
+        }
+
+        .location-info i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .attendance-history {
+            margin-top: 40px;
+        }
+
+        .attendance-history h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #f1f5f9;
+            color: var(--text-light);
+        }
+
+        .logout-btn:hover {
+            background-color: #e2e8f0;
+            color: var(--text);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            animation: modal-appear 0.3s ease-out;
+        }
+
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .error-message {
+            color: var(--error);
+            margin-top: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .time-display {
+                font-size: 2.5rem;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistem Absensi Pegawai</h1>
+            <p>Absensi digital yang modern dan efisien</p>
+        </div>
+
+        <!-- Login Section -->
+        <div id="login-section" class="card login-form">
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Masuk ke Sistem</h2>
+            <div class="form-group">
+                <label for="nip">NIP</label>
+                <input type="text" id="nip" placeholder="Masukkan NIP Anda">
+                <div id="login-error" class="error-message">NIP tidak ditemukan</div>
+            </div>
+            <button id="login-btn" class="btn btn-block">
+                <i class="fas fa-sign-in-alt"></i> Masuk
+            </button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="dashboard">
+            <button id="logout-btn" class="btn logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Keluar
+            </button>
+
+            <div class="user-info">
+                <div class="avatar" id="user-avatar">U</div>
+                <div class="user-details">
+                    <h2 id="user-name">Nama Pegawai</h2>
+                    <p id="user-nip">NIP: -</p>
+                    <p id="user-department">Department: -</p>
+                    <p id="user-level">Level: -</p>
+                </div>
+            </div>
+
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="attendance">Absensi</div>
+                <div class="nav-tab" data-tab="history">Riwayat</div>
+            </div>
+
+            <!-- Attendance Tab -->
+            <div id="attendance-tab" class="tab-content active">
+                <div class="card attendance-card">
+                    <div class="time-display" id="current-time">00:00:00</div>
+                    <div class="date-display" id="current-date">Hari, DD MMMM YYYY</div>
+                    
+                    <div class="location-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="location-status">Mendeteksi lokasi...</span>
+                    </div>
+                    
+                    <button id="attendance-btn" class="btn btn-success" style="padding: 15px 30px; font-size: 1.2rem;">
+                        <i class="fas fa-fingerprint"></i> Absen Hari Ini
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="card attendance-history">
+                    <h3>Riwayat Absensi</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-history-body">
+                            <!-- Data riwayat akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="modal">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <h3>Memproses Absensi</h3>
+            <p>Harap tunggu sebentar...</p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Absensi Berhasil</h3>
+            <p>Terima kasih sudah absen hari ini!</p>
+        </div>
+    </div>
+
+    <script>
+        // Data pegawai (akan diambil dari Google Sheets)
+        let employees = [];
+        let currentUser = null;
+        let attendanceHistory = [];
+        
+        // Koordinat kantor
+        const officeLat = -6.22494694;
+        const officeLng = 106.814519;
+        const maxDistance = 200; // dalam meter
+        
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const dashboard = document.getElementById('dashboard');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const nipInput = document.getElementById('nip');
+        const loginError = document.getElementById('login-error');
+        const userName = document.getElementById('user-name');
+        const userNip = document.getElementById('user-nip');
+        const userDepartment = document.getElementById('user-department');
+        const userLevel = document.getElementById('user-level');
+        const userAvatar = document.getElementById('user-avatar');
+        const currentTime = document.getElementById('current-time');
+        const currentDate = document.getElementById('current-date');
+        const locationStatus = document.getElementById('location-status');
+        const attendanceBtn = document.getElementById('attendance-btn');
+        const attendanceHistoryBody = document.getElementById('attendance-history-body');
+        const loadingModal = document.getElementById('loading-modal');
+        const successModal = document.getElementById('success-modal');
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load employee data from Google Sheets
+            loadEmployeeData();
+            
+            // Update time and date
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // Check geolocation
+            checkLocation();
+            
+            // Event listeners
+            loginBtn.addEventListener('click', handleLogin);
+            logoutBtn.addEventListener('click', handleLogout);
+            attendanceBtn.addEventListener('click', handleAttendance);
+            nipInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            // Tab navigation
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        });
+        
+        // Load employee data from Google Sheets
+        async function loadEmployeeData() {
+            try {
+                // In a real implementation, you would fetch from the Google Sheets URL
+                // For demo purposes, we'll use mock data
+                employees = [
+                    { NIP: '12345', NAMA: 'Ahmad Fauzi', DEPARTMENT: 'IT', LEVEL: 'Staff' },
+                    { NIP: '23456', NAMA: 'Siti Rahayu', DEPARTMENT: 'HR', LEVEL: 'Manager' },
+                    { NIP: '34567', NAMA: 'Budi Santoso', DEPARTMENT: 'Finance', LEVEL: 'Supervisor' },
+                    { NIP: '45678', NAMA: 'Dewi Lestari', DEPARTMENT: 'Marketing', LEVEL: 'Staff' },
+                    { NIP: '56789', NAMA: 'Rizki Pratama', DEPARTMENT: 'Operations', LEVEL: 'Manager' }
+                ];
+                
+                // In a real implementation, uncomment the following:
+                /*
+                const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSv_eiU8hMGEFY4vYzMkh6unWqjgGx4JNJUQbunRDTavYxudywsuQiUnThtHoMyb7VtwK7kWTbQ2mfn/pub?gid=0&single=true&output=csv');
+                const csvData = await response.text();
+                
+                // Parse CSV data
+                const rows = csvData.split('\n');
+                const headers = rows[0].split(',');
+                
+                employees = rows.slice(1).map(row => {
+                    const values = row.split(',');
+                    const employee = {};
+                    headers.forEach((header, index) => {
+                        employee[header.trim()] = values[index] ? values[index].trim() : '';
+                    });
+                    return employee;
+                });
+                */
+                
+                console.log('Employee data loaded:', employees);
+            } catch (error) {
+                console.error('Error loading employee data:', error);
+            }
+        }
+        
+        // Update current time and date
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format time
+            const timeString = now.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            currentTime.textContent = timeString;
+            
+            // Format date
+            const dateString = now.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            currentDate.textContent = dateString;
+        }
+        
+        // Check user location
+        function checkLocation() {
+            if (!navigator.geolocation) {
+                locationStatus.textContent = 'Geolocation tidak didukung oleh browser ini';
+                attendanceBtn.disabled = true;
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    
+                    // Calculate distance from office
+                    const distance = calculateDistance(officeLat, officeLng, userLat, userLng);
+                    
+                    if (distance <= maxDistance) {
+                        locationStatus.textContent = `Anda berada di kantor (${Math.round(distance)}m dari titik absensi)`;
+                        locationStatus.style.color = 'var(--success)';
+                        attendanceBtn.disabled = false;
+                    } else {
+                        locationStatus.textContent = `Anda berada di luar kantor (${Math.round(distance)}m dari titik absensi)`;
+                        locationStatus.style.color = 'var(--error)';
+                        attendanceBtn.disabled = true;
+                    }
+                },
+                function(error) {
+                    console.error('Error getting location:', error);
+                    locationStatus.textContent = 'Tidak dapat mengakses lokasi';
+                    locationStatus.style.color = 'var(--error)';
+                    attendanceBtn.disabled = true;
+                }
+            );
+        }
+        
+        // Calculate distance between two coordinates (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Earth radius in meters
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c;
+            return distance;
+        }
+        
+        // Handle login
+        function handleLogin() {
+            const nip = nipInput.value.trim();
+            
+            if (!nip) {
+                showLoginError('Harap masukkan NIP');
+                return;
+            }
+            
+            // Find employee by NIP
+            const employee = employees.find(emp => emp.NIP === nip);
+            
+            if (employee) {
+                currentUser = employee;
+                showDashboard();
+            } else {
+                showLoginError('NIP tidak ditemukan');
+            }
+        }
+        
+        // Show login error
+        function showLoginError(message) {
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+            
+            // Shake animation for error
+            loginSection.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                loginSection.style.animation = '';
+            }, 500);
+        }
+        
+        // Show dashboard
+        function showDashboard() {
+            // Update user info
+            userName.textContent = currentUser.NAMA;
+            userNip.textContent = `NIP: ${currentUser.NIP}`;
+            userDepartment.textContent = `Department: ${currentUser.DEPARTMENT}`;
+            userLevel.textContent = `Level: ${currentUser.LEVEL}`;
+            userAvatar.textContent = currentUser.NAMA.charAt(0);
+            
+            // Load attendance history for this user
+            loadAttendanceHistory();
+            
+            // Show dashboard, hide login
+            loginSection.style.display = 'none';
+            dashboard.style.display = 'block';
+            
+            // Check location again
+            checkLocation();
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            currentUser = null;
+            nipInput.value = '';
+            loginError.style.display = 'none';
+            
+            // Show login, hide dashboard
+            loginSection.style.display = 'block';
+            dashboard.style.display = 'none';
+        }
+        
+        // Handle attendance
+        function handleAttendance() {
+            // Show loading modal
+            loadingModal.style.display = 'flex';
+            
+            // Simulate API call to save attendance
+            setTimeout(() => {
+                // Hide loading modal
+                loadingModal.style.display = 'none';
+                
+                // Show success modal
+                successModal.style.display = 'flex';
+                
+                // Add to attendance history
+                const now = new Date();
+                const attendanceRecord = {
+                    date: now.toLocaleDateString('id-ID'),
+                    time: now.toLocaleTimeString('id-ID'),
+                    location: 'Kantor',
+                    status: 'Berhasil'
+                };
+                
+                attendanceHistory.unshift(attendanceRecord);
+                updateAttendanceHistory();
+                
+                // Hide success modal after 3 seconds
+                setTimeout(() => {
+                    successModal.style.display = 'none';
+                    
+                    // Disable attendance button for today
+                    attendanceBtn.disabled = true;
+                    attendanceBtn.innerHTML = '<i class="fas fa-check"></i> Sudah Absen Hari Ini';
+                }, 3000);
+                
+                // In a real implementation, you would send data to Google Apps Script
+                // sendAttendanceToGoogleSheet();
+            }, 2000);
+        }
+        
+        // Load attendance history
+        function loadAttendanceHistory() {
+            // In a real implementation, you would fetch from storage/API
+            // For demo, we'll generate some mock data
+            attendanceHistory = [];
+            
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                
+                attendanceHistory.push({
+                    date: date.toLocaleDateString('id-ID'),
+                    time: `${8 + Math.floor(Math.random() * 2)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:00`,
+                    location: 'Kantor',
+                    status: 'Berhasil'
+                });
+            }
+            
+            updateAttendanceHistory();
+        }
+        
+        // Update attendance history table
+        function updateAttendanceHistory() {
+            attendanceHistoryBody.innerHTML = '';
+            
+            attendanceHistory.forEach(record => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.time}</td>
+                    <td>${record.location}</td>
+                    <td><span class="status status-success">${record.status}</span></td>
+                `;
+                
+                attendanceHistoryBody.appendChild(row);
+            });
+        }
+        
+        // Send attendance data to Google Sheet (via Google Apps Script)
+        async function sendAttendanceToGoogleSheet() {
+            try {
+                const scriptURL = 'https://script.google.com/macros/s/AKfycby6cI35aYgKScfFD8ugnHb6IQjEj0wfoC45ES0BkXbLyKkTnEaLDHoj-lp0YXH9qhbB/exec';
+                
+                const formData = new FormData();
+                formData.append('nip', currentUser.NIP);
+                formData.append('nama', currentUser.NAMA);
+                formData.append('department', currentUser.DEPARTMENT);
+                formData.append('level', currentUser.LEVEL);
+                formData.append('timestamp', new Date().toISOString());
+                
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Attendance data sent to Google Sheet');
+            } catch (error) {
+                console.error('Error sending data to Google Sheet:', error);
+            }
+        }
+        
+        // Add shake animation for errors
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
