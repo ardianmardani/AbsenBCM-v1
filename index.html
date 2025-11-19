@@ -567,8 +567,29 @@
         });
         
         // Load employee data from Google Sheets
-        async function loadEmployeeData() {
-            try {
+async function loadEmployeeData() {
+    try {
+        // URL Google Apps Script Anda
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby1m24LwJJWjKILG36xY9PpeTz1GNH9Hg5-1vyDkwRuqv8S7LHC42ODkRAy985fdl7Z/exec';
+        
+        console.log('Fetching employee data from Google Sheets...');
+        
+        const response = await fetch(scriptURL);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Data received from Google Sheets:', data);
+        
+        // Pastikan data adalah array
+        if (Array.isArray(data)) {
+            employees = data;
+            console.log(`Loaded ${employees.length} employees from Google Sheets`);
+        } else {
+            throw new Error('Data format is not array');
+        }
                 // In a real implementation, you would fetch from the Google Sheets URL
                 // For demo purposes, we'll use mock data
                 employees = [
