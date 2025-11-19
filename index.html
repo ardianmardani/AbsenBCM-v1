@@ -410,7 +410,26 @@
             margin: 10px 0;
             font-size: 0.8rem;
             color: #64748b;
-            display: none;
+            display: block;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .debug-toggle {
+            background: #e2e8f0;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.7rem;
         }
 
         @media (max-width: 768px) {
@@ -459,7 +478,7 @@
             <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Masuk ke Sistem</h2>
             <div class="form-group">
                 <label for="nip">NIP</label>
-                <input type="text" id="nip" placeholder="Masukkan NIP Anda">
+                <input type="text" id="nip" placeholder="Masukkan NIP Anda" value="2094738515">
                 <div id="login-error" class="error-message">NIP tidak ditemukan</div>
             </div>
             <button id="login-btn" class="btn btn-block">
@@ -467,9 +486,12 @@
             </button>
             
             <!-- Debug Info -->
-            <div id="debug-info" class="debug-info">
+            <div class="debug-header">
                 <strong>Debug Information:</strong>
-                <div id="debug-content"></div>
+                <button class="debug-toggle" onclick="toggleDebug()">Hide/Show</button>
+            </div>
+            <div id="debug-info" class="debug-info">
+                <div id="debug-content">Aplikasi dimulai...</div>
             </div>
         </div>
 
@@ -597,9 +619,8 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            if (DEBUG) {
-                debugInfo.style.display = 'block';
-            }
+            updateDebugInfo('Aplikasi dimulai...');
+            updateDebugInfo('Mencoba NIP: 2094738515 (pre-filled untuk testing)');
             
             // Load employee data from Google Sheets
             loadEmployeeData();
@@ -640,6 +661,11 @@
                 });
             });
         });
+
+        // Toggle debug visibility
+        function toggleDebug() {
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+        }
         
         // Update debug information
         function updateDebugInfo(message) {
@@ -661,7 +687,7 @@
                 
                 // Tambahkan timestamp untuk avoid cache
                 const url = EMPLOYEE_DATA_URL + '?t=' + new Date().getTime();
-                updateDebugInfo(`Mengakses URL: ${url}`);
+                updateDebugInfo(`Mengakses URL: ${EMPLOYEE_DATA_URL}`);
                 
                 const response = await fetch(url);
                 updateDebugInfo(`Response status: ${response.status}`);
@@ -671,15 +697,22 @@
                 }
                 
                 const data = await response.json();
-                updateDebugInfo(`Data diterima: ${JSON.stringify(data).substring(0, 200)}...`);
+                updateDebugInfo(`Data RAW diterima: ${JSON.stringify(data)}`);
                 
                 if (Array.isArray(data) && data.length > 0) {
                     employees = data;
                     updateDebugInfo(`Berhasil memuat ${employees.length} pegawai dari Google Sheets`);
                     
+                    // Log semua employee untuk debugging
+                    updateDebugInfo('=== DATA PEGAWAI YANG DITERIMA ===');
+                    employees.forEach((emp, index) => {
+                        updateDebugInfo(`Pegawai ${index + 1}: NIP="${emp.NIP}" (tipe: ${typeof emp.NIP}), NAMA="${emp.NAMA}", DEPT="${emp.DEPARTMENT}", LEVEL="${emp.LEVEL}"`);
+                    });
+                    updateDebugInfo('=== END DATA PEGAWAI ===');
+                    
                     // Log semua NIP yang tersedia untuk debugging
                     const availableNips = employees.map(emp => emp.NIP).join(', ');
-                    updateDebugInfo(`NIP yang tersedia: ${availableNips}`);
+                    updateDebugInfo(`Semua NIP yang tersedia: ${availableNips}`);
                     
                     // Sembunyikan warning jika ada
                     const existingWarning = document.querySelector('.data-warning');
@@ -811,11 +844,11 @@
             return distance;
         }
         
-        // Handle login
+        // Handle login dengan flexible NIP matching
         async function handleLogin() {
             const nip = nipInput.value.trim();
             
-            updateDebugInfo(`Memproses login dengan NIP: ${nip}`);
+            updateDebugInfo(`=== MEMPROSES LOGIN DENGAN NIP: ${nip} ===`);
             
             if (!nip) {
                 showLoginError('Harap masukkan NIP');
@@ -836,33 +869,83 @@
             loginBtn.classList.add('loading');
             
             try {
-                updateDebugInfo(`Mencari pegawai dengan NIP: ${nip}`);
+                updateDebugInfo(`Mencari pegawai dengan NIP: "${nip}"`);
                 updateDebugInfo(`Total pegawai dalam database: ${employees.length}`);
                 
-                // Debug: log semua employee
-                employees.forEach((emp, index) => {
-                    updateDebugInfo(`Pegawai ${index + 1}: NIP="${emp.NIP}", NAMA="${emp.NAMA}"`);
-                });
+                // Flexible NIP matching - coba berbagai format
+                let employee = null;
                 
-                // Find employee by NIP - berbagai format kemungkinan
-                const employee = employees.find(emp => {
-                    const empNip = emp.NIP ? emp.NIP.toString().trim() : '';
-                    const inputNip = nip.toString().trim();
-                    
-                    updateDebugInfo(`Membandingkan: "${empNip}" dengan "${inputNip}"`);
-                    
-                    return empNip === inputNip;
+                // Method 1: Exact match dengan trim
+                employee = employees.find(emp => {
+                    if (!emp.NIP) return false;
+                    const empNip = emp.NIP.toString().trim();
+                    return empNip === nip;
                 });
                 
                 if (employee) {
-                    updateDebugInfo(`Login BERHASIL: ${employee.NAMA}`);
+                    updateDebugInfo('✓ Ditemukan dengan exact match');
+                } else {
+                    // Method 2: Match tanpa memperdulikan spasi
+                    employee = employees.find(emp => {
+                        if (!emp.NIP) return false;
+                        const empNip = emp.NIP.toString().replace(/\s/g, '');
+                        const inputNip = nip.replace(/\s/g, '');
+                        return empNip === inputNip;
+                    });
+                    if (employee) updateDebugInfo('✓ Ditemukan dengan match tanpa spasi');
+                }
+                
+                if (!employee) {
+                    // Method 3: Match sebagai number
+                    employee = employees.find(emp => {
+                        if (!emp.NIP) return false;
+                        const empNip = parseInt(emp.NIP.toString().replace(/\s/g, ''));
+                        const inputNip = parseInt(nip.replace(/\s/g, ''));
+                        return !isNaN(empNip) && !isNaN(inputNip) && empNip === inputNip;
+                    });
+                    if (employee) updateDebugInfo('✓ Ditemukan dengan match sebagai number');
+                }
+                
+                if (!employee) {
+                    // Method 4: Partial match
+                    employee = employees.find(emp => {
+                        if (!emp.NIP) return false;
+                        const empNip = emp.NIP.toString().replace(/\s/g, '');
+                        const inputNip = nip.replace(/\s/g, '');
+                        return empNip.includes(inputNip) || inputNip.includes(empNip);
+                    });
+                    if (employee) updateDebugInfo('✓ Ditemukan dengan partial match');
+                }
+                
+                if (employee) {
+                    updateDebugInfo(`✓ Login BERHASIL: ${employee.NAMA} (NIP: ${employee.NIP})`);
                     currentUser = employee;
                     showDashboard();
                 } else {
-                    updateDebugInfo('Login GAGAL: NIP tidak ditemukan');
+                    updateDebugInfo('✗ Login GAGAL: NIP tidak ditemukan dengan metode apapun');
+                    updateDebugInfo('Mencoba manual test dengan NIP 2094738515...');
+                    
+                    // Manual test untuk NIP 2094738515
+                    const testResult = employees.find(emp => {
+                        if (!emp.NIP) return false;
+                        const empNip = emp.NIP.toString();
+                        updateDebugInfo(`Testing: "${empNip}" === "2094738515" ? ${empNip === "2094738515"}`);
+                        return empNip === "2094738515";
+                    });
+                    
+                    if (testResult) {
+                        updateDebugInfo('✓ NIP 2094738515 DITEMUKAN secara manual!');
+                        updateDebugInfo('Masalah: mungkin ada issue di input NIP');
+                    } else {
+                        updateDebugInfo('✗ NIP 2094738515 TIDAK DITEMUKAN di database');
+                    }
+                    
                     showLoginError('NIP tidak ditemukan dalam database');
                 }
                 
+            } catch (error) {
+                updateDebugInfo(`ERROR dalam proses login: ${error.message}`);
+                showLoginError('Terjadi error saat proses login');
             } finally {
                 // Reset loading state
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
@@ -884,7 +967,7 @@
         
         // Show dashboard
         function showDashboard() {
-            updateDebugInfo(`Menampilkan dashboard untuk: ${currentUser.NAMA}`);
+            updateDebugInfo(`✓ Menampilkan dashboard untuk: ${currentUser.NAMA}`);
             
             // Update user info
             userName.textContent = currentUser.NAMA;
@@ -959,7 +1042,7 @@
                 
                 // Show success modal
                 successModal.style.display = 'flex';
-                updateDebugInfo('Absensi BERHASIL');
+                updateDebugInfo('✓ Absensi BERHASIL');
                 
                 // Add to attendance history
                 const now = new Date();
@@ -987,14 +1070,14 @@
             } catch (error) {
                 console.error('Error during attendance:', error);
                 loadingModal.style.display = 'none';
-                updateDebugInfo(`ERROR Absensi: ${error.message}`);
+                updateDebugInfo(`✗ ERROR Absensi: ${error.message}`);
                 alert(`Error: ${error.message}`);
             }
         }
         
         // Get current position with promise
         function getCurrentPosition() {
-            return new Promise((resolve, reject) {
+            return new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject);
             });
         }
@@ -1024,12 +1107,12 @@
                 }
                 
                 const result = await response.json();
-                updateDebugInfo('Data absensi berhasil disimpan ke Google Sheet');
+                updateDebugInfo('✓ Data absensi berhasil disimpan ke Google Sheet');
                 return result;
                 
             } catch (error) {
                 console.error('Error saving to Google Sheet:', error);
-                updateDebugInfo(`ERROR Save: ${error.message}`);
+                updateDebugInfo(`✗ ERROR Save: ${error.message}`);
                 // Tetap lanjutkan meski gagal save ke Google Sheet
                 // Data sudah disimpan di localStorage sebagai backup
                 saveToLocalStorage(data);
@@ -1045,7 +1128,7 @@
                 updateDebugInfo('Data absensi disimpan ke localStorage sebagai backup');
             } catch (error) {
                 console.error('Error saving to localStorage:', error);
-                updateDebugInfo(`ERROR LocalStorage: ${error.message}`);
+                updateDebugInfo(`✗ ERROR LocalStorage: ${error.message}`);
             }
         }
         
