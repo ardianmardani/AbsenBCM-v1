@@ -78,7 +78,7 @@
         }
 
         .login-form {
-            max-width: 400px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
@@ -153,256 +153,6 @@
             box-shadow: none;
         }
 
-        .btn:disabled:hover {
-            background-color: #94a3b8;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .dashboard {
-            display: none;
-            width: 100%;
-            position: relative;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-right: 20px;
-        }
-
-        .user-details h2 {
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .user-details p {
-            color: var(--text-light);
-            margin-bottom: 3px;
-        }
-
-        .attendance-card {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .time-display {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        .date-display {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            margin-bottom: 30px;
-        }
-
-        .location-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            color: var(--text-light);
-        }
-
-        .location-info i {
-            margin-right: 8px;
-            color: var(--primary);
-        }
-
-        .attendance-history {
-            margin-top: 40px;
-        }
-
-        .attendance-history h3 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary-light);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .status-success {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #f1f5f9;
-            color: var(--text-light);
-        }
-
-        .logout-btn:hover {
-            background-color: #e2e8f0;
-            color: var(--text);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: var(--shadow);
-            animation: modal-appear 0.3s ease-out;
-        }
-
-        @keyframes modal-appear {
-            from {
-                opacity: 0;
-                transform: scale(0.9) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid #e2e8f0;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .success-icon {
-            width: 60px;
-            height: 60px;
-            background-color: var(--success);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 1.8rem;
-        }
-
-        .error-message {
-            color: var(--error);
-            margin-top: 10px;
-            font-size: 0.9rem;
-            display: none;
-        }
-
-        .data-warning {
-            background: #fef3cd;
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            color: #92400e;
-            font-size: 0.9rem;
-        }
-
-        .data-warning i {
-            margin-right: 8px;
-        }
-
-        .nav-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .nav-tab {
-            padding: 12px 20px;
-            cursor: pointer;
-            color: var(--text-light);
-            font-weight: 500;
-            transition: var(--transition);
-            border-bottom: 3px solid transparent;
-        }
-
-        .nav-tab.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
         .debug-info {
             background: #f1f5f9;
             border-radius: 8px;
@@ -410,15 +160,14 @@
             margin: 10px 0;
             font-size: 0.8rem;
             color: #64748b;
-            display: block;
-            max-height: 200px;
-            overflow-y: auto;
             border: 1px solid #e2e8f0;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .debug-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
@@ -432,760 +181,283 @@
             font-size: 0.7rem;
         }
 
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .time-display {
-                font-size: 2.5rem;
-            }
-            
-            .user-info {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .avatar {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-            
-            .logout-btn {
-                position: relative;
-                top: 0;
-                right: 0;
-                margin-bottom: 20px;
-            }
+        .test-section {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .test-btn {
+            padding: 8px 15px;
+            font-size: 0.8rem;
+        }
+
+        .data-preview {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Sistem Absensi Pegawai</h1>
-            <p>Absensi digital yang modern dan efisien</p>
+            <h1>Sistem Absensi Pegawai - DEBUG MODE</h1>
+            <p>Testing login dengan NIP 2094738515</p>
         </div>
 
         <!-- Login Section -->
         <div id="login-section" class="card login-form">
             <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Masuk ke Sistem</h2>
+            
+            <div class="test-section">
+                <strong>🛠️ Testing Tools:</strong>
+                <div class="test-buttons">
+                    <button id="test-fetch" class="btn test-btn">
+                        <i class="fas fa-download"></i> Test Fetch Data
+                    </button>
+                    <button id="test-nip" class="btn test-btn">
+                        <i class="fas fa-search"></i> Test NIP 2094738515
+                    </button>
+                    <button id="clear-debug" class="btn test-btn">
+                        <i class="fas fa-broom"></i> Clear Debug
+                    </button>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="nip">NIP</label>
                 <input type="text" id="nip" placeholder="Masukkan NIP Anda" value="2094738515">
                 <div id="login-error" class="error-message">NIP tidak ditemukan</div>
             </div>
+            
             <button id="login-btn" class="btn btn-block">
                 <i class="fas fa-sign-in-alt"></i> Masuk
             </button>
+
+            <!-- Data Preview -->
+            <div class="data-preview">
+                <strong>📊 Data dari Google Sheets:</strong>
+                <pre id="data-preview-content">Loading...</pre>
+            </div>
             
             <!-- Debug Info -->
             <div class="debug-header">
-                <strong>Debug Information:</strong>
+                <strong>🔍 Debug Information:</strong>
                 <button class="debug-toggle" onclick="toggleDebug()">Hide/Show</button>
             </div>
             <div id="debug-info" class="debug-info">
-                <div id="debug-content">Aplikasi dimulai...</div>
+                <div id="debug-content">Aplikasi dimulai... Klik "Test Fetch Data" untuk memulai</div>
             </div>
-        </div>
-
-        <!-- Dashboard Section -->
-        <div id="dashboard" class="dashboard">
-            <button id="logout-btn" class="btn logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Keluar
-            </button>
-
-            <div class="user-info">
-                <div class="avatar" id="user-avatar">U</div>
-                <div class="user-details">
-                    <h2 id="user-name">Nama Pegawai</h2>
-                    <p id="user-nip">NIP: -</p>
-                    <p id="user-department">Department: -</p>
-                    <p id="user-level">Level: -</p>
-                </div>
-            </div>
-
-            <div class="nav-tabs">
-                <div class="nav-tab active" data-tab="attendance">Absensi</div>
-                <div class="nav-tab" data-tab="history">Riwayat</div>
-            </div>
-
-            <!-- Attendance Tab -->
-            <div id="attendance-tab" class="tab-content active">
-                <div class="card attendance-card">
-                    <div class="time-display" id="current-time">00:00:00</div>
-                    <div class="date-display" id="current-date">Hari, DD MMMM YYYY</div>
-                    
-                    <div class="location-info">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span id="location-status">Mendeteksi lokasi...</span>
-                    </div>
-                    
-                    <button id="attendance-btn" class="btn btn-success" style="padding: 15px 30px; font-size: 1.2rem;" disabled>
-                        <i class="fas fa-fingerprint"></i> Absen Hari Ini
-                    </button>
-                </div>
-            </div>
-
-            <!-- History Tab -->
-            <div id="history-tab" class="tab-content">
-                <div class="card attendance-history">
-                    <h3>Riwayat Absensi</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Waktu</th>
-                                <th>Lokasi</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendance-history-body">
-                            <!-- Data riwayat akan diisi oleh JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Modal -->
-    <div id="loading-modal" class="modal">
-        <div class="modal-content">
-            <div class="loading-spinner"></div>
-            <h3>Memproses Absensi</h3>
-            <p>Harap tunggu sebentar...</p>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id="success-modal" class="modal">
-        <div class="modal-content">
-            <div class="success-icon">
-                <i class="fas fa-check"></i>
-            </div>
-            <h3>Absensi Berhasil</h3>
-            <p>Terima kasih sudah absen hari ini!</p>
         </div>
     </div>
 
     <script>
         // Data pegawai (akan diambil dari Google Sheets via Google Apps Script)
         let employees = [];
-        let currentUser = null;
-        let attendanceHistory = [];
-        
-        // Koordinat kantor
-        const officeLat = -6.22494694;
-        const officeLng = 106.814519;
-        const maxDistance = 200; // dalam meter
-        
-        // URLs Google Apps Script
         const EMPLOYEE_DATA_URL = 'https://script.google.com/macros/s/AKfycbw39WMu3eNxivpjpLhXOZXkoOEUaMcY_SMJ2caJ1HUOFifAIvDPZSnKmfrw1JKw65Q0uw/exec';
-        const ATTENDANCE_BACKUP_URL = 'https://script.google.com/macros/s/AKfycby6cI35aYgKScfFD8ugnHb6IQjEj0wfoC45ES0BkXbLyKkTnEaLDHoj-lp0YXH9qhbB/exec';
         
         // DOM Elements
-        const loginSection = document.getElementById('login-section');
-        const dashboard = document.getElementById('dashboard');
-        const loginBtn = document.getElementById('login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const nipInput = document.getElementById('nip');
-        const loginError = document.getElementById('login-error');
-        const userName = document.getElementById('user-name');
-        const userNip = document.getElementById('user-nip');
-        const userDepartment = document.getElementById('user-department');
-        const userLevel = document.getElementById('user-level');
-        const userAvatar = document.getElementById('user-avatar');
-        const currentTime = document.getElementById('current-time');
-        const currentDate = document.getElementById('current-date');
-        const locationStatus = document.getElementById('location-status');
-        const attendanceBtn = document.getElementById('attendance-btn');
-        const attendanceHistoryBody = document.getElementById('attendance-history-body');
-        const loadingModal = document.getElementById('loading-modal');
-        const successModal = document.getElementById('success-modal');
-        const navTabs = document.querySelectorAll('.nav-tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const debugInfo = document.getElementById('debug-info');
         const debugContent = document.getElementById('debug-content');
-        
-        // Debug mode
-        const DEBUG = true;
+        const dataPreview = document.getElementById('data-preview-content');
+        const nipInput = document.getElementById('nip');
+        const loginBtn = document.getElementById('login-btn');
+        const testFetchBtn = document.getElementById('test-fetch');
+        const testNipBtn = document.getElementById('test-nip');
+        const clearDebugBtn = document.getElementById('clear-debug');
 
-        // Initialize the application
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            updateDebugInfo('Aplikasi dimulai...');
-            updateDebugInfo('Mencoba NIP: 2094738515 (pre-filled untuk testing)');
-            
-            // Load employee data from Google Sheets
-            loadEmployeeData();
-            
-            // Update time and date
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            
-            // Check geolocation
-            checkLocation();
+            updateDebugInfo('🚀 Aplikasi dimulai');
+            updateDebugInfo(`🎯 Target NIP: 2094738515`);
+            updateDebugInfo(`🔗 URL Google Sheets: ${EMPLOYEE_DATA_URL}`);
             
             // Event listeners
             loginBtn.addEventListener('click', handleLogin);
-            logoutBtn.addEventListener('click', handleLogout);
-            attendanceBtn.addEventListener('click', handleAttendance);
-            nipInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    handleLogin();
-                }
-            });
+            testFetchBtn.addEventListener('click', testFetchData);
+            testNipBtn.addEventListener('click', testNipSearch);
+            clearDebugBtn.addEventListener('click', clearDebug);
             
-            // Tab navigation
-            navTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // Update active tab
-                    navTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Show corresponding content
-                    tabContents.forEach(content => {
-                        content.classList.remove('active');
-                        if (content.id === `${tabId}-tab`) {
-                            content.classList.add('active');
-                        }
-                    });
-                });
-            });
+            // Auto test fetch data
+            setTimeout(() => {
+                testFetchData();
+            }, 1000);
         });
 
-        // Toggle debug visibility
         function toggleDebug() {
+            const debugInfo = document.getElementById('debug-info');
             debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
         }
-        
-        // Update debug information
+
+        function clearDebug() {
+            debugContent.innerHTML = 'Debug cleared...';
+            updateDebugInfo('🧹 Debug cleared');
+        }
+
         function updateDebugInfo(message) {
-            if (!DEBUG) return;
-            
             const timestamp = new Date().toLocaleTimeString();
             debugContent.innerHTML += `<div>[${timestamp}] ${message}</div>`;
             debugContent.scrollTop = debugContent.scrollHeight;
         }
-        
-        // Load employee data from Google Sheets via Google Apps Script
-        async function loadEmployeeData() {
+
+        function updateDataPreview(data) {
+            dataPreview.textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Test fetch data dari Google Sheets
+        async function testFetchData() {
+            updateDebugInfo('🔍 TEST: Memulai fetch data dari Google Sheets...');
+            
             try {
-                // Tampilkan loading state
-                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat Data...';
-                loginBtn.classList.add('loading');
-                
-                updateDebugInfo('Memulai pengambilan data dari Google Sheets...');
-                
-                // Tambahkan timestamp untuk avoid cache
                 const url = EMPLOYEE_DATA_URL + '?t=' + new Date().getTime();
-                updateDebugInfo(`Mengakses URL: ${EMPLOYEE_DATA_URL}`);
+                updateDebugInfo(`📡 Mengakses: ${url}`);
                 
                 const response = await fetch(url);
-                updateDebugInfo(`Response status: ${response.status}`);
+                updateDebugInfo(`📊 Response Status: ${response.status} ${response.statusText}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                updateDebugInfo(`Data RAW diterima: ${JSON.stringify(data)}`);
+                updateDebugInfo(`✅ Data berhasil diambil`);
+                updateDebugInfo(`📦 Tipe data: ${Array.isArray(data) ? 'Array' : typeof data}`);
+                updateDebugInfo(`🔢 Jumlah data: ${Array.isArray(data) ? data.length : 'N/A'}`);
                 
-                if (Array.isArray(data) && data.length > 0) {
+                // Update preview
+                updateDataPreview(data);
+                
+                if (Array.isArray(data)) {
                     employees = data;
-                    updateDebugInfo(`Berhasil memuat ${employees.length} pegawai dari Google Sheets`);
+                    updateDebugInfo(`👥 Total pegawai: ${employees.length}`);
                     
-                    // Log semua employee untuk debugging
-                    updateDebugInfo('=== DATA PEGAWAI YANG DITERIMA ===');
+                    // Log detail setiap pegawai
                     employees.forEach((emp, index) => {
-                        updateDebugInfo(`Pegawai ${index + 1}: NIP="${emp.NIP}" (tipe: ${typeof emp.NIP}), NAMA="${emp.NAMA}", DEPT="${emp.DEPARTMENT}", LEVEL="${emp.LEVEL}"`);
+                        updateDebugInfo(`--- Pegawai ${index + 1} ---`);
+                        updateDebugInfo(`   NIP: "${emp.NIP}" (tipe: ${typeof emp.NIP})`);
+                        updateDebugInfo(`   NAMA: "${emp.NAMA}"`);
+                        updateDebugInfo(`   DEPARTMENT: "${emp.DEPARTMENT}"`);
+                        updateDebugInfo(`   LEVEL: "${emp.LEVEL}"`);
+                        
+                        // Test khusus untuk NIP 2094738515
+                        if (emp.NIP && emp.NIP.toString().includes('2094738515')) {
+                            updateDebugInfo(`   🎯 NIP 2094738515 DITEMUKAN!`);
+                            updateDebugInfo(`   🔍 Perbandingan: "${emp.NIP}" === "2094738515" ? ${emp.NIP === "2094738515"}`);
+                            updateDebugInfo(`   🔍 Perbandingan: "${emp.NIP.toString().trim()}" === "2094738515" ? ${emp.NIP.toString().trim() === "2094738515"}`);
+                        }
                     });
-                    updateDebugInfo('=== END DATA PEGAWAI ===');
                     
-                    // Log semua NIP yang tersedia untuk debugging
-                    const availableNips = employees.map(emp => emp.NIP).join(', ');
-                    updateDebugInfo(`Semua NIP yang tersedia: ${availableNips}`);
+                    // Cek apakah NIP 2094738515 ada
+                    const found = employees.some(emp => 
+                        emp.NIP && emp.NIP.toString().includes('2094738515')
+                    );
                     
-                    // Sembunyikan warning jika ada
-                    const existingWarning = document.querySelector('.data-warning');
-                    if (existingWarning) {
-                        existingWarning.remove();
+                    if (found) {
+                        updateDebugInfo(`🎉 NIP 2094738515 ADA dalam database!`);
+                    } else {
+                        updateDebugInfo(`❌ NIP 2094738515 TIDAK ADA dalam database`);
+                        updateDebugInfo(`📋 NIP yang tersedia: ${employees.map(emp => emp.NIP).join(', ')}`);
                     }
+                    
                 } else {
-                    throw new Error('Data kosong atau bukan array');
+                    updateDebugInfo(`❌ Data bukan array, format: ${typeof data}`);
                 }
                 
             } catch (error) {
-                console.error('Error loading employee data from Google Sheets:', error);
-                updateDebugInfo(`ERROR: ${error.message}`);
-                
-                showDataError('Gagal memuat data dari server, menggunakan data sementara');
-                
-                // Fallback ke data demo jika gagal
-                employees = getFallbackData();
-                updateDebugInfo(`Menggunakan data fallback: ${employees.length} pegawai`);
-                
-            } finally {
-                // Reset loading state
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
-                loginBtn.classList.remove('loading');
+                updateDebugInfo(`❌ ERROR: ${error.message}`);
+                updateDataPreview({ error: error.message });
             }
         }
-        
-        function showDataError(message) {
-            // Hapus warning sebelumnya jika ada
-            const existingWarning = document.querySelector('.data-warning');
-            if (existingWarning) {
-                existingWarning.remove();
-            }
+
+        // Test pencarian NIP
+        async function testNipSearch() {
+            const testNip = '2094738515';
+            updateDebugInfo(`\n🔍 TEST: Mencari NIP "${testNip}"...`);
             
-            const warningDiv = document.createElement('div');
-            warningDiv.className = 'data-warning';
-            warningDiv.innerHTML = `
-                <i class="fas fa-exclamation-triangle"></i> ${message}
-            `;
-            loginSection.insertBefore(warningDiv, loginSection.firstChild);
-        }
-        
-        function getFallbackData() {
-            return [
-                { NIP: '12345', NAMA: 'Ahmad Fauzi', DEPARTMENT: 'IT', LEVEL: 'Staff' },
-                { NIP: '23456', NAMA: 'Siti Rahayu', DEPARTMENT: 'HR', LEVEL: 'Manager' },
-                { NIP: '34567', NAMA: 'Budi Santoso', DEPARTMENT: 'Finance', LEVEL: 'Supervisor' },
-                { NIP: '45678', NAMA: 'Dewi Lestari', DEPARTMENT: 'Marketing', LEVEL: 'Staff' },
-                { NIP: '56789', NAMA: 'Rizki Pratama', DEPARTMENT: 'Operations', LEVEL: 'Manager' }
-            ];
-        }
-        
-        // Update current time and date
-        function updateDateTime() {
-            const now = new Date();
-            
-            // Format time
-            const timeString = now.toLocaleTimeString('id-ID', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            });
-            currentTime.textContent = timeString;
-            
-            // Format date
-            const dateString = now.toLocaleDateString('id-ID', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            currentDate.textContent = dateString;
-        }
-        
-        // Check user location
-        function checkLocation() {
-            if (!navigator.geolocation) {
-                locationStatus.textContent = 'Geolocation tidak didukung oleh browser ini';
-                attendanceBtn.disabled = true;
+            if (employees.length === 0) {
+                updateDebugInfo('❌ Data pegawai masih kosong, fetch data dulu');
                 return;
             }
             
-            updateDebugInfo('Memulai deteksi lokasi...');
+            // Multiple matching strategies
+            const strategies = [
+                { name: 'Exact match', test: (emp) => emp.NIP && emp.NIP.toString().trim() === testNip },
+                { name: 'Exact match no trim', test: (emp) => emp.NIP && emp.NIP.toString() === testNip },
+                { name: 'Number match', test: (emp) => emp.NIP && parseInt(emp.NIP) === parseInt(testNip) },
+                { name: 'String includes', test: (emp) => emp.NIP && emp.NIP.toString().includes(testNip) },
+                { name: 'Reverse includes', test: (emp) => emp.NIP && testNip.includes(emp.NIP.toString()) },
+                { name: 'Length match', test: (emp) => emp.NIP && emp.NIP.toString().length === testNip.length }
+            ];
             
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const userLat = position.coords.latitude;
-                    const userLng = position.coords.longitude;
-                    
-                    updateDebugInfo(`Lokasi terdeteksi: ${userLat}, ${userLng}`);
-                    
-                    // Calculate distance from office
-                    const distance = calculateDistance(officeLat, officeLng, userLat, userLng);
-                    updateDebugInfo(`Jarak dari kantor: ${Math.round(distance)}m`);
-                    
-                    if (distance <= maxDistance) {
-                        locationStatus.textContent = `Anda berada di kantor (${Math.round(distance)}m dari titik absensi)`;
-                        locationStatus.style.color = 'var(--success)';
-                        attendanceBtn.disabled = false;
-                        updateDebugInfo('Lokasi valid, tombol absen diaktifkan');
-                    } else {
-                        locationStatus.textContent = `Anda berada di luar kantor (${Math.round(distance)}m dari titik absensi)`;
-                        locationStatus.style.color = 'var(--error)';
-                        attendanceBtn.disabled = true;
-                        updateDebugInfo('Lokasi tidak valid, tombol absen dinonaktifkan');
-                    }
-                },
-                function(error) {
-                    console.error('Error getting location:', error);
-                    locationStatus.textContent = 'Tidak dapat mengakses lokasi';
-                    locationStatus.style.color = 'var(--error)';
-                    attendanceBtn.disabled = true;
-                    updateDebugInfo(`ERROR Lokasi: ${error.message}`);
+            let found = false;
+            
+            strategies.forEach(strategy => {
+                const result = employees.find(strategy.test);
+                if (result) {
+                    updateDebugInfo(`✅ ${strategy.name}: DITEMUKAN - ${result.NAMA} (NIP: ${result.NIP})`);
+                    found = true;
+                } else {
+                    updateDebugInfo(`❌ ${strategy.name}: Tidak ditemukan`);
                 }
-            );
+            });
+            
+            if (!found) {
+                updateDebugInfo(`\n🔎 DETAIL PENCARIAN:`);
+                employees.forEach((emp, index) => {
+                    updateDebugInfo(`Pegawai ${index + 1}: NIP="${emp.NIP}" → "${testNip}" = ${emp.NIP == testNip}`);
+                });
+            }
         }
-        
-        // Calculate distance between two coordinates (Haversine formula)
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371000; // Earth radius in meters
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const distance = R * c;
-            return distance;
-        }
-        
-        // Handle login dengan flexible NIP matching
+
+        // Handle login
         async function handleLogin() {
             const nip = nipInput.value.trim();
-            
-            updateDebugInfo(`=== MEMPROSES LOGIN DENGAN NIP: ${nip} ===`);
+            updateDebugInfo(`\n🔐 LOGIN ATTEMPT: "${nip}"`);
             
             if (!nip) {
-                showLoginError('Harap masukkan NIP');
-                updateDebugInfo('Login gagal: NIP kosong');
+                updateDebugInfo('❌ NIP kosong');
                 return;
             }
             
-            // Tunggu sampai data employee selesai di-load
             if (employees.length === 0) {
-                showLoginError('Sedang memuat data pegawai...');
-                updateDebugInfo('Login ditunda: data pegawai belum selesai dimuat');
-                setTimeout(() => handleLogin(), 1000);
+                updateDebugInfo('❌ Data belum dimuat');
                 return;
             }
             
-            // Tampilkan loading
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
-            loginBtn.classList.add('loading');
+            // Cari dengan berbagai metode
+            let employee = null;
+            const methods = [
+                { name: 'Exact', test: (emp) => emp.NIP && emp.NIP.toString().trim() === nip },
+                { name: 'No Trim', test: (emp) => emp.NIP && emp.NIP.toString() === nip },
+                { name: 'Number', test: (emp) => emp.NIP && parseInt(emp.NIP) === parseInt(nip) },
+                { name: 'String', test: (emp) => emp.NIP && emp.NIP.toString() == nip }
+            ];
             
-            try {
-                updateDebugInfo(`Mencari pegawai dengan NIP: "${nip}"`);
-                updateDebugInfo(`Total pegawai dalam database: ${employees.length}`);
-                
-                // Flexible NIP matching - coba berbagai format
-                let employee = null;
-                
-                // Method 1: Exact match dengan trim
-                employee = employees.find(emp => {
-                    if (!emp.NIP) return false;
-                    const empNip = emp.NIP.toString().trim();
-                    return empNip === nip;
-                });
-                
+            for (let method of methods) {
+                employee = employees.find(method.test);
                 if (employee) {
-                    updateDebugInfo('✓ Ditemukan dengan exact match');
-                } else {
-                    // Method 2: Match tanpa memperdulikan spasi
-                    employee = employees.find(emp => {
-                        if (!emp.NIP) return false;
-                        const empNip = emp.NIP.toString().replace(/\s/g, '');
-                        const inputNip = nip.replace(/\s/g, '');
-                        return empNip === inputNip;
-                    });
-                    if (employee) updateDebugInfo('✓ Ditemukan dengan match tanpa spasi');
+                    updateDebugInfo(`✅ Login BERHASIL dengan metode: ${method.name}`);
+                    updateDebugInfo(`👤 User: ${employee.NAMA} (${employee.NIP})`);
+                    alert(`Login BERHASIL! Selamat datang ${employee.NAMA}`);
+                    return;
                 }
-                
-                if (!employee) {
-                    // Method 3: Match sebagai number
-                    employee = employees.find(emp => {
-                        if (!emp.NIP) return false;
-                        const empNip = parseInt(emp.NIP.toString().replace(/\s/g, ''));
-                        const inputNip = parseInt(nip.replace(/\s/g, ''));
-                        return !isNaN(empNip) && !isNaN(inputNip) && empNip === inputNip;
-                    });
-                    if (employee) updateDebugInfo('✓ Ditemukan dengan match sebagai number');
-                }
-                
-                if (!employee) {
-                    // Method 4: Partial match
-                    employee = employees.find(emp => {
-                        if (!emp.NIP) return false;
-                        const empNip = emp.NIP.toString().replace(/\s/g, '');
-                        const inputNip = nip.replace(/\s/g, '');
-                        return empNip.includes(inputNip) || inputNip.includes(empNip);
-                    });
-                    if (employee) updateDebugInfo('✓ Ditemukan dengan partial match');
-                }
-                
-                if (employee) {
-                    updateDebugInfo(`✓ Login BERHASIL: ${employee.NAMA} (NIP: ${employee.NIP})`);
-                    currentUser = employee;
-                    showDashboard();
-                } else {
-                    updateDebugInfo('✗ Login GAGAL: NIP tidak ditemukan dengan metode apapun');
-                    updateDebugInfo('Mencoba manual test dengan NIP 2094738515...');
-                    
-                    // Manual test untuk NIP 2094738515
-                    const testResult = employees.find(emp => {
-                        if (!emp.NIP) return false;
-                        const empNip = emp.NIP.toString();
-                        updateDebugInfo(`Testing: "${empNip}" === "2094738515" ? ${empNip === "2094738515"}`);
-                        return empNip === "2094738515";
-                    });
-                    
-                    if (testResult) {
-                        updateDebugInfo('✓ NIP 2094738515 DITEMUKAN secara manual!');
-                        updateDebugInfo('Masalah: mungkin ada issue di input NIP');
-                    } else {
-                        updateDebugInfo('✗ NIP 2094738515 TIDAK DITEMUKAN di database');
-                    }
-                    
-                    showLoginError('NIP tidak ditemukan dalam database');
-                }
-                
-            } catch (error) {
-                updateDebugInfo(`ERROR dalam proses login: ${error.message}`);
-                showLoginError('Terjadi error saat proses login');
-            } finally {
-                // Reset loading state
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
-                loginBtn.classList.remove('loading');
-            }
-        }
-        
-        // Show login error
-        function showLoginError(message) {
-            loginError.textContent = message;
-            loginError.style.display = 'block';
-            
-            // Shake animation for error
-            loginSection.style.animation = 'shake 0.5s';
-            setTimeout(() => {
-                loginSection.style.animation = '';
-            }, 500);
-        }
-        
-        // Show dashboard
-        function showDashboard() {
-            updateDebugInfo(`✓ Menampilkan dashboard untuk: ${currentUser.NAMA}`);
-            
-            // Update user info
-            userName.textContent = currentUser.NAMA;
-            userNip.textContent = `NIP: ${currentUser.NIP}`;
-            userDepartment.textContent = `Department: ${currentUser.DEPARTMENT}`;
-            userLevel.textContent = `Level: ${currentUser.LEVEL}`;
-            userAvatar.textContent = currentUser.NAMA.charAt(0);
-            
-            // Load attendance history for this user
-            loadAttendanceHistory();
-            
-            // Show dashboard, hide login
-            loginSection.style.display = 'none';
-            dashboard.style.display = 'block';
-            
-            // Check location again
-            checkLocation();
-        }
-        
-        // Handle logout
-        function handleLogout() {
-            updateDebugInfo('Logout dilakukan');
-            
-            currentUser = null;
-            nipInput.value = '';
-            loginError.style.display = 'none';
-            
-            // Show login, hide dashboard
-            loginSection.style.display = 'block';
-            dashboard.style.display = 'none';
-        }
-        
-        // Handle attendance
-        async function handleAttendance() {
-            updateDebugInfo('Memulai proses absensi...');
-            
-            // Show loading modal
-            loadingModal.style.display = 'flex';
-            
-            try {
-                // Get current location for attendance
-                const position = await getCurrentPosition();
-                const userLat = position.coords.latitude;
-                const userLng = position.coords.longitude;
-                const distance = calculateDistance(officeLat, officeLng, userLat, userLng);
-                
-                updateDebugInfo(`Lokasi absensi: ${userLat}, ${userLng} (${Math.round(distance)}m dari kantor)`);
-                
-                if (distance > maxDistance) {
-                    throw new Error('Anda berada di luar area kantor');
-                }
-                
-                // Simpan data absensi
-                const attendanceData = {
-                    nip: currentUser.NIP,
-                    nama: currentUser.NAMA,
-                    department: currentUser.DEPARTMENT,
-                    level: currentUser.LEVEL,
-                    timestamp: new Date().toISOString(),
-                    latitude: userLat,
-                    longitude: userLng,
-                    distance: Math.round(distance)
-                };
-                
-                updateDebugInfo('Menyimpan data absensi ke Google Sheets...');
-                
-                // Simpan ke Google Sheets via Google Apps Script
-                await saveAttendanceToGoogleSheet(attendanceData);
-                
-                // Hide loading modal
-                loadingModal.style.display = 'none';
-                
-                // Show success modal
-                successModal.style.display = 'flex';
-                updateDebugInfo('✓ Absensi BERHASIL');
-                
-                // Add to attendance history
-                const now = new Date();
-                const attendanceRecord = {
-                    date: now.toLocaleDateString('id-ID'),
-                    time: now.toLocaleTimeString('id-ID'),
-                    location: 'Kantor',
-                    status: 'Berhasil',
-                    distance: `${Math.round(distance)}m`
-                };
-                
-                attendanceHistory.unshift(attendanceRecord);
-                updateAttendanceHistory();
-                
-                // Hide success modal after 3 seconds
-                setTimeout(() => {
-                    successModal.style.display = 'none';
-                    
-                    // Disable attendance button for today
-                    attendanceBtn.disabled = true;
-                    attendanceBtn.innerHTML = '<i class="fas fa-check"></i> Sudah Absen Hari Ini';
-                    updateDebugInfo('Tombol absen dinonaktifkan untuk hari ini');
-                }, 3000);
-                
-            } catch (error) {
-                console.error('Error during attendance:', error);
-                loadingModal.style.display = 'none';
-                updateDebugInfo(`✗ ERROR Absensi: ${error.message}`);
-                alert(`Error: ${error.message}`);
-            }
-        }
-        
-        // Get current position with promise
-        function getCurrentPosition() {
-            return new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject);
-            });
-        }
-        
-        // Save attendance data to Google Sheet
-        async function saveAttendanceToGoogleSheet(data) {
-            try {
-                const formData = new FormData();
-                formData.append('nip', data.nip);
-                formData.append('nama', data.nama);
-                formData.append('department', data.department);
-                formData.append('level', data.level);
-                formData.append('timestamp', data.timestamp);
-                formData.append('latitude', data.latitude);
-                formData.append('longitude', data.longitude);
-                formData.append('distance', data.distance);
-                
-                updateDebugInfo(`Mengirim data ke: ${ATTENDANCE_BACKUP_URL}`);
-                
-                const response = await fetch(ATTENDANCE_BACKUP_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Gagal menyimpan data ke server');
-                }
-                
-                const result = await response.json();
-                updateDebugInfo('✓ Data absensi berhasil disimpan ke Google Sheet');
-                return result;
-                
-            } catch (error) {
-                console.error('Error saving to Google Sheet:', error);
-                updateDebugInfo(`✗ ERROR Save: ${error.message}`);
-                // Tetap lanjutkan meski gagal save ke Google Sheet
-                // Data sudah disimpan di localStorage sebagai backup
-                saveToLocalStorage(data);
-                throw new Error('Absensi berhasil, tetapi gagal menyimpan ke server. Data disimpan sementara di browser.');
-            }
-        }
-        
-        // Save to localStorage as backup
-        function saveToLocalStorage(data) {
-            try {
-                const key = `attendance_${currentUser.NIP}_${new Date().toISOString().split('T')[0]}`;
-                localStorage.setItem(key, JSON.stringify(data));
-                updateDebugInfo('Data absensi disimpan ke localStorage sebagai backup');
-            } catch (error) {
-                console.error('Error saving to localStorage:', error);
-                updateDebugInfo(`✗ ERROR LocalStorage: ${error.message}`);
-            }
-        }
-        
-        // Load attendance history
-        function loadAttendanceHistory() {
-            // In a real implementation, you would fetch from storage/API
-            // For demo, we'll generate some mock data
-            attendanceHistory = [];
-            
-            const today = new Date();
-            for (let i = 0; i < 7; i++) {
-                const date = new Date();
-                date.setDate(today.getDate() - i);
-                
-                // Skip future dates
-                if (date > today) continue;
-                
-                attendanceHistory.push({
-                    date: date.toLocaleDateString('id-ID'),
-                    time: `${8 + Math.floor(Math.random() * 2)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:00`,
-                    location: 'Kantor',
-                    status: 'Berhasil',
-                    distance: `${50 + Math.floor(Math.random() * 150)}m`
-                });
             }
             
-            updateAttendanceHistory();
-            updateDebugInfo(`Memuat ${attendanceHistory.length} riwayat absensi`);
-        }
-        
-        // Update attendance history table
-        function updateAttendanceHistory() {
-            attendanceHistoryBody.innerHTML = '';
-            
-            if (attendanceHistory.length === 0) {
-                attendanceHistoryBody.innerHTML = `
-                    <tr>
-                        <td colspan="4" style="text-align: center; color: var(--text-light);">
-                            <i class="fas fa-inbox"></i> Belum ada riwayat absensi
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            attendanceHistory.forEach(record => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${record.date}</td>
-                    <td>${record.time}</td>
-                    <td>${record.location} (${record.distance})</td>
-                    <td><span class="status status-success">${record.status}</span></td>
-                `;
-                
-                attendanceHistoryBody.appendChild(row);
-            });
+            updateDebugInfo('❌ Login GAGAL - NIP tidak ditemukan');
+            updateDebugInfo(`📋 NIP yang tersedia: ${employees.map(emp => `"${emp.NIP}"`).join(', ')}`);
+            alert('Login GAGAL: NIP tidak ditemukan');
         }
     </script>
 </body>
