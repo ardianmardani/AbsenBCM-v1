@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Pegawai - Google Sheets DB</title>
+    <title>Absensi Pegawai</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -55,6 +55,11 @@
             transition: var(--transition);
         }
 
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -73,7 +78,7 @@
         }
 
         .login-form {
-            max-width: 500px;
+            max-width: 400px;
             margin: 0 auto;
         }
 
@@ -148,30 +153,243 @@
             box-shadow: none;
         }
 
-        .debug-panel {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 0.8rem;
+        .btn:disabled:hover {
+            background-color: #94a3b8;
+            transform: none;
+            box-shadow: none;
         }
 
-        .debug-content {
-            max-height: 200px;
-            overflow-y: auto;
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
+        .dashboard {
+            display: none;
+            width: 100%;
+            position: relative;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-right: 20px;
+        }
+
+        .user-details h2 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: var(--text-light);
+            margin-bottom: 3px;
+        }
+
+        .attendance-card {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .time-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .location-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            color: var(--text-light);
+        }
+
+        .location-info i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .attendance-history {
+            margin-top: 40px;
+        }
+
+        .attendance-history h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #f1f5f9;
+            color: var(--text-light);
+        }
+
+        .logout-btn:hover {
+            background-color: #e2e8f0;
+            color: var(--text);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            animation: modal-appear 0.3s ease-out;
+        }
+
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 1.8rem;
+        }
+
+        .error-message {
+            color: var(--error);
             margin-top: 10px;
-            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .status-message {
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
-            margin: 10px 0;
+            margin: 15px 0;
             text-align: center;
+            font-weight: 500;
         }
 
         .status-success {
@@ -191,75 +409,214 @@
             color: #d97706;
             border: 1px solid #fde68a;
         }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .time-display {
+                font-size: 2.5rem;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .logout-btn {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Absensi Pegawai</h1>
-            <p>Google Sheets sebagai Database</p>
+            <h1>Sistem Absensi Pegawai</h1>
+            <p>Absensi digital yang modern dan efisien</p>
         </div>
 
-        <div class="card login-form">
+        <!-- Login Section -->
+        <div id="login-section" class="card login-form">
             <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">Masuk ke Sistem</h2>
             
             <div id="status-message"></div>
 
             <div class="form-group">
                 <label for="nip">NIP</label>
-                <input type="text" id="nip" placeholder="Masukkan NIP Anda" value="2094738515">
+                <input type="text" id="nip" placeholder="Masukkan NIP Anda">
+                <div id="login-error" class="error-message">NIP tidak ditemukan</div>
             </div>
             
             <button id="login-btn" class="btn btn-block">
                 <i class="fas fa-sign-in-alt"></i> Masuk
             </button>
+        </div>
 
-            <div class="debug-panel">
-                <strong>🔧 Debug Information:</strong>
-                <button onclick="toggleDebug()" style="margin-left: 10px; padding: 2px 8px; font-size: 0.7rem;">Toggle</button>
-                <div id="debug-content" class="debug-content">
-                    Sistem sedang dimulai...
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="dashboard">
+            <button id="logout-btn" class="btn logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Keluar
+            </button>
+
+            <div class="user-info">
+                <div class="avatar" id="user-avatar">U</div>
+                <div class="user-details">
+                    <h2 id="user-name">Nama Pegawai</h2>
+                    <p id="user-nip">NIP: -</p>
+                    <p id="user-department">Department: -</p>
+                    <p id="user-level">Level: -</p>
                 </div>
             </div>
 
-            <div style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--text-light);">
-                <strong>💡 Tips:</strong> Pastikan Google Sheets sudah di-share publicly
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="attendance">Absensi</div>
+                <div class="nav-tab" data-tab="history">Riwayat</div>
+            </div>
+
+            <!-- Attendance Tab -->
+            <div id="attendance-tab" class="tab-content active">
+                <div class="card attendance-card">
+                    <div class="time-display" id="current-time">00:00:00</div>
+                    <div class="date-display" id="current-date">Hari, DD MMMM YYYY</div>
+                    
+                    <div class="location-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="location-status">Mendeteksi lokasi...</span>
+                    </div>
+                    
+                    <button id="attendance-btn" class="btn btn-success" style="padding: 15px 30px; font-size: 1.2rem;" disabled>
+                        <i class="fas fa-fingerprint"></i> Absen Hari Ini
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="card attendance-history">
+                    <h3>Riwayat Absensi</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-history-body">
+                            <!-- Data riwayat akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="modal">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <h3>Memproses Absensi</h3>
+            <p>Harap tunggu sebentar...</p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3>Absensi Berhasil</h3>
+            <p>Terima kasih sudah absen hari ini!</p>
+        </div>
+    </div>
+
     <script>
-        // ==================== KONFIGURASI GOOGLE SHEETS ====================
+        // ==================== KONFIGURASI ====================
         const GOOGLE_SHEETS_CONFIG = {
-            // GANTI DENGAN URL PUBLIK GOOGLE SHEETS ANDA
-            sheetUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSv_eiU8hMGEFY4vYzMkh6unWqjgGx4JNJUQbunRDTavYxudywsuQiUnThtHoMyb7VtwK7kWTbQ2mfn/pub?output=csv',
-            
-            // Atau gunakan Google Apps Script sebagai proxy
             scriptUrl: 'https://script.google.com/macros/s/AKfycbw39WMu3eNxivpjpLhXOZXkoOEUaMcY_SMJ2caJ1HUOFifAIvDPZSnKmfrw1JKw65Q0uw/exec'
         };
 
-        let employees = [];
-        const debugContent = document.getElementById('debug-content');
-        const statusMessage = document.getElementById('status-message');
-        const loginBtn = document.getElementById('login-btn');
-        const nipInput = document.getElementById('nip');
+        const officeLat = -6.22494694;
+        const officeLng = 106.814519;
+        const maxDistance = 200;
 
-        // Initialize
+        let employees = [];
+        let currentUser = null;
+        let attendanceHistory = [];
+        
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const dashboard = document.getElementById('dashboard');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const nipInput = document.getElementById('nip');
+        const loginError = document.getElementById('login-error');
+        const statusMessage = document.getElementById('status-message');
+        const userName = document.getElementById('user-name');
+        const userNip = document.getElementById('user-nip');
+        const userDepartment = document.getElementById('user-department');
+        const userLevel = document.getElementById('user-level');
+        const userAvatar = document.getElementById('user-avatar');
+        const currentTime = document.getElementById('current-time');
+        const currentDate = document.getElementById('current-date');
+        const locationStatus = document.getElementById('location-status');
+        const attendanceBtn = document.getElementById('attendance-btn');
+        const attendanceHistoryBody = document.getElementById('attendance-history-body');
+        const loadingModal = document.getElementById('loading-modal');
+        const successModal = document.getElementById('success-modal');
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // ==================== INITIALIZE ====================
         document.addEventListener('DOMContentLoaded', function() {
-            updateDebug('🚀 Aplikasi dimulai');
-            updateStatus('Mengambil data dari Google Sheets...', 'warning');
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            checkLocation();
             
+            // Event listeners
             loginBtn.addEventListener('click', handleLogin);
+            logoutBtn.addEventListener('click', handleLogout);
+            attendanceBtn.addEventListener('click', handleAttendance);
+            nipInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') handleLogin();
+            });
             
-            // Load data dari Google Sheets
+            // Tab navigation
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Load employee data
             loadEmployeesFromGoogleSheets();
         });
-
-        function updateDebug(message) {
-            const timestamp = new Date().toLocaleTimeString();
-            debugContent.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-            debugContent.scrollTop = debugContent.scrollHeight;
-        }
 
         function updateStatus(message, type = 'info') {
             const icons = {
@@ -276,52 +633,65 @@
             `;
         }
 
-        function toggleDebug() {
-            const debugPanel = document.querySelector('.debug-panel');
-            const debugContent = document.getElementById('debug-content');
-            
-            if (debugContent.style.display === 'none') {
-                debugContent.style.display = 'block';
-                debugPanel.style.height = 'auto';
-            } else {
-                debugContent.style.display = 'none';
-                debugPanel.style.height = '50px';
-            }
+        function updateDateTime() {
+            const now = new Date();
+            currentTime.textContent = now.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            currentDate.textContent = now.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
         }
 
-        // ==================== LOAD DATA DARI GOOGLE SHEETS ====================
+        function checkLocation() {
+            if (!navigator.geolocation) {
+                locationStatus.textContent = 'Geolocation tidak didukung';
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    const distance = calculateDistance(officeLat, officeLng, userLat, userLng);
+                    
+                    if (distance <= maxDistance) {
+                        locationStatus.textContent = `Anda berada di kantor (${Math.round(distance)}m dari titik absensi)`;
+                        locationStatus.style.color = 'var(--success)';
+                        if (currentUser) attendanceBtn.disabled = false;
+                    } else {
+                        locationStatus.textContent = `Anda berada di luar kantor (${Math.round(distance)}m dari titik absensi)`;
+                        locationStatus.style.color = 'var(--error)';
+                        attendanceBtn.disabled = true;
+                    }
+                },
+                function(error) {
+                    locationStatus.textContent = 'Tidak dapat mengakses lokasi';
+                    locationStatus.style.color = 'var(--error)';
+                }
+            );
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // ==================== DATA LOADING ====================
         async function loadEmployeesFromGoogleSheets() {
-            updateDebug('📡 Mengambil data dari Google Sheets...');
+            updateStatus('Mengambil data pegawai...', 'warning');
             
-            try {
-                // Coba multiple approaches
-                let data = await tryApproach1(); // Google Apps Script
-                if (!data || data.length === 0) {
-                    data = await tryApproach2(); // Direct CSV
-                }
-                if (!data || data.length === 0) {
-                    data = await tryApproach3(); // JSONP style
-                }
-                
-                if (data && data.length > 0) {
-                    employees = data;
-                    updateDebug(`✅ Data loaded: ${employees.length} pegawai`);
-                    updateDebug(`📋 NIP tersedia: ${employees.map(e => e.NIP).join(', ')}`);
-                    updateStatus('Sistem siap, silakan login', 'success');
-                } else {
-                    throw new Error('Semua method gagal');
-                }
-                
-            } catch (error) {
-                updateDebug(`❌ Error: ${error.message}`);
-                updateStatus('Gagal memuat data, menggunakan data fallback', 'warning');
-                useFallbackData();
-            }
-        }
-
-        // Approach 1: Google Apps Script
-        async function tryApproach1() {
-            updateDebug('🔧 Approach 1: Google Apps Script');
             try {
                 const url = GOOGLE_SHEETS_CONFIG.scriptUrl + '?t=' + Date.now();
                 const response = await fetch(url);
@@ -329,214 +699,171 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const data = await response.json();
-                updateDebug(`✅ GAS Response: ${data.length} records`);
-                return data;
-            } catch (error) {
-                updateDebug(`❌ GAS Failed: ${error.message}`);
-                return null;
-            }
-        }
-
-        // Approach 2: Direct CSV dari published Google Sheets
-        async function tryApproach2() {
-            updateDebug('🔧 Approach 2: Direct CSV');
-            try {
-                const response = await fetch(GOOGLE_SHEETS_CONFIG.sheetUrl);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
-                const csvText = await response.text();
-                updateDebug(`✅ CSV Received: ${csvText.substring(0, 100)}...`);
-                
-                const data = parseCSV(csvText);
-                updateDebug(`✅ CSV Parsed: ${data.length} records`);
-                return data;
-            } catch (error) {
-                updateDebug(`❌ CSV Failed: ${error.message}`);
-                return null;
-            }
-        }
-
-        // Approach 3: JSONP style (bypass CORS)
-        async function tryApproach3() {
-            updateDebug('🔧 Approach 3: JSONP Approach');
-            return new Promise((resolve) => {
-                // Fallback ke method lain
-                setTimeout(() => {
-                    updateDebug('❌ JSONP Not implemented');
-                    resolve(null);
-                }, 1000);
-            });
-        }
-
-        // Parse CSV to JSON
-        function parseCSV(csvText) {
-            try {
-                const lines = csvText.split('\n').filter(line => line.trim());
-                if (lines.length < 2) return [];
-                
-                const headers = lines[0].split(',').map(h => h.trim());
-                const result = [];
-                
-                for (let i = 1; i < lines.length; i++) {
-                    const values = lines[i].split(',').map(v => v.trim());
-                    if (values.length === headers.length) {
-                        const employee = {};
-                        headers.forEach((header, index) => {
-                            employee[header] = values[index];
-                        });
-                        result.push(employee);
-                    }
+                if (Array.isArray(data) && data.length > 0) {
+                    employees = data;
+                    updateStatus('Sistem siap, silakan login', 'success');
+                } else {
+                    throw new Error('Data kosong');
                 }
                 
-                return result;
             } catch (error) {
-                updateDebug(`❌ CSV Parse Error: ${error.message}`);
-                return [];
+                console.error('Error loading data:', error);
+                updateStatus('Menggunakan data sementara', 'warning');
+                useFallbackData();
             }
         }
 
-        // Fallback data
         function useFallbackData() {
             employees = [
                 { NIP: "2094738515", NAMA: "Budi Santoso", DEPARTMENT: "IT", LEVEL: "Staff" },
                 { NIP: "3123456789", NAMA: "Siti Rahayu", DEPARTMENT: "HR", LEVEL: "Manager" },
                 { NIP: "1234567890", NAMA: "Ahmad Fauzi", DEPARTMENT: "Finance", LEVEL: "Supervisor" }
             ];
-            updateDebug(`🔄 Using fallback data: ${employees.length} records`);
         }
 
         // ==================== LOGIN HANDLER ====================
-        async function handleLogin() {
+        function handleLogin() {
             const nip = nipInput.value.trim();
-            updateDebug(`\n🔐 Login attempt: "${nip}"`);
             
             if (!nip) {
-                updateStatus('Harap masukkan NIP', 'error');
+                showLoginError('Harap masukkan NIP');
                 return;
             }
-            
+
             if (employees.length === 0) {
                 updateStatus('Data belum siap, tunggu sebentar', 'error');
                 return;
             }
 
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
-            loginBtn.disabled = true;
+            const employee = employees.find(emp => 
+                emp.NIP && emp.NIP.toString().trim() === nip
+            );
 
-            try {
-                // Cari pegawai dengan multiple matching strategies
-                const employee = findEmployee(nip);
-                
-                if (employee) {
-                    updateDebug(`✅ Login BERHASIL: ${employee.NAMA}`);
-                    updateStatus(`Login berhasil! Selamat datang ${employee.NAMA}`, 'success');
-                    
-                    // Simulate successful login
-                    showSuccessLogin(employee);
-                } else {
-                    updateDebug('❌ Login GAGAL: NIP tidak ditemukan');
-                    updateStatus('NIP tidak ditemukan dalam database', 'error');
-                    
-                    // Show available NIPs for help
-                    const availableNips = employees.map(e => e.NIP).join(', ');
-                    updateDebug(`📋 NIP yang tersedia: ${availableNips}`);
-                }
-            } finally {
-                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
-                loginBtn.disabled = false;
+            if (employee) {
+                currentUser = employee;
+                showDashboard();
+            } else {
+                showLoginError('NIP tidak ditemukan dalam database');
             }
         }
 
-        function findEmployee(nip) {
-            const strategies = [
-                // Exact match
-                emp => emp.NIP && emp.NIP.toString().trim() === nip,
-                
-                // Number match
-                emp => emp.NIP && parseInt(emp.NIP) === parseInt(nip),
-                
-                // String match
-                emp => emp.NIP && emp.NIP.toString() == nip,
-                
-                // Includes match
-                emp => emp.NIP && emp.NIP.toString().includes(nip)
-            ];
+        function showLoginError(message) {
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+            loginSection.style.animation = 'shake 0.5s';
+            setTimeout(() => loginSection.style.animation = '', 500);
+        }
+
+        function showDashboard() {
+            userName.textContent = currentUser.NAMA;
+            userNip.textContent = `NIP: ${currentUser.NIP}`;
+            userDepartment.textContent = `Department: ${currentUser.DEPARTMENT}`;
+            userLevel.textContent = `Level: ${currentUser.LEVEL}`;
+            userAvatar.textContent = currentUser.NAMA.charAt(0);
             
-            for (let strategy of strategies) {
-                const employee = employees.find(strategy);
-                if (employee) {
-                    updateDebug(`🔍 Found with: ${strategy.name || 'custom strategy'}`);
-                    return employee;
-                }
+            loadAttendanceHistory();
+            loginSection.style.display = 'none';
+            dashboard.style.display = 'block';
+            checkLocation();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            nipInput.value = '';
+            loginError.style.display = 'none';
+            statusMessage.innerHTML = '';
+            loginSection.style.display = 'block';
+            dashboard.style.display = 'none';
+        }
+
+        // ==================== ATTENDANCE HANDLER ====================
+        async function handleAttendance() {
+            loadingModal.style.display = 'flex';
+            
+            // Simulate API call
+            setTimeout(() => {
+                loadingModal.style.display = 'none';
+                successModal.style.display = 'flex';
+                
+                // Add to attendance history
+                const now = new Date();
+                const attendanceRecord = {
+                    date: now.toLocaleDateString('id-ID'),
+                    time: now.toLocaleTimeString('id-ID'),
+                    location: 'Kantor',
+                    status: 'Berhasil'
+                };
+                
+                attendanceHistory.unshift(attendanceRecord);
+                updateAttendanceHistory();
+                
+                // Hide success modal after 3 seconds
+                setTimeout(() => {
+                    successModal.style.display = 'none';
+                    attendanceBtn.disabled = true;
+                    attendanceBtn.innerHTML = '<i class="fas fa-check"></i> Sudah Absen Hari Ini';
+                }, 3000);
+            }, 2000);
+        }
+
+        function loadAttendanceHistory() {
+            attendanceHistory = [];
+            const today = new Date();
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                
+                if (date > today) continue;
+                
+                attendanceHistory.push({
+                    date: date.toLocaleDateString('id-ID'),
+                    time: `${8 + Math.floor(Math.random() * 2)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:00`,
+                    location: 'Kantor',
+                    status: 'Berhasil'
+                });
             }
             
-            return null;
+            updateAttendanceHistory();
         }
 
-        function showSuccessLogin(employee) {
-            // Create success modal
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
+        function updateAttendanceHistory() {
+            attendanceHistoryBody.innerHTML = '';
             
-            modal.innerHTML = `
-                <div style="
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    text-align: center;
-                    max-width: 400px;
-                    width: 90%;
-                ">
-                    <div style="
-                        width: 60px;
-                        height: 60px;
-                        background: #10b981;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin: 0 auto 20px;
-                        color: white;
-                        font-size: 1.5rem;
-                    ">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <h3 style="color: #1e40af; margin-bottom: 15px;">Login Berhasil!</h3>
-                    <div style="text-align: left; background: #f8fafc; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                        <p><strong>Nama:</strong> ${employee.NAMA}</p>
-                        <p><strong>NIP:</strong> ${employee.NIP}</p>
-                        <p><strong>Department:</strong> ${employee.DEPARTMENT}</p>
-                        <p><strong>Level:</strong> ${employee.LEVEL}</p>
-                    </div>
-                    <button onclick="this.closest('div').style.display='none'" style="
-                        background: #1e40af;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                    ">
-                        Tutup
-                    </button>
-                </div>
-            `;
+            if (attendanceHistory.length === 0) {
+                attendanceHistoryBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-light);">
+                            <i class="fas fa-inbox"></i> Belum ada riwayat absensi
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
             
-            document.body.appendChild(modal);
+            attendanceHistory.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.time}</td>
+                    <td>${record.location}</td>
+                    <td><span class="status status-success">${record.status}</span></td>
+                `;
+                attendanceHistoryBody.appendChild(row);
+            });
         }
 
-        // Add to global scope for button click
-        window.toggleDebug = toggleDebug;
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
