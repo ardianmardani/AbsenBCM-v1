@@ -73,6 +73,25 @@
             10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
             20%, 40%, 60%, 80% { transform: translateX(10px); }
         }
+
+        /* Custom scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #64748b;
+            border-radius: 3px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -88,16 +107,40 @@
         <div id="login-screen">
             <p class="text-center mb-6 text-slate-400">Silakan masukkan Nomor Induk Pegawai (NIP) Anda untuk masuk.</p>
             <div class="space-y-4">
-                <input type="text" id="nip-input" placeholder="Masukkan NIP Anda" class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 focus:ring-light-blue focus:border-light-blue text-white">
-                <button id="login-btn" onclick="handleLogin()" class="btn-primary w-full p-3 rounded-lg font-semibold text-lg hover:shadow-lg hover:shadow-blue-500/50">
+                <input type="text" id="nip-input" placeholder="Masukkan NIP Anda" 
+                       class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 focus:ring-light-blue focus:border-light-blue text-white placeholder-slate-400"
+                       onkeypress="handleNipEnter(event)">
+                <button id="login-btn" onclick="handleLogin()" 
+                        class="btn-primary w-full p-3 rounded-lg font-semibold text-lg hover:shadow-lg hover:shadow-blue-500/50 flex items-center justify-center">
                     <i class="ph-sign-in-bold mr-2"></i> Masuk
                 </button>
             </div>
             <p id="login-error" class="text-red-400 mt-4 text-center hidden"></p>
+            
+            <!-- Status Koneksi -->
+            <div id="connection-status" class="mt-4 p-3 rounded-lg bg-slate-800 hidden">
+                <div class="flex items-center">
+                    <i class="ph-wifi-high mr-2 text-yellow-400"></i>
+                    <span class="text-sm text-yellow-400">Memeriksa koneksi...</span>
+                </div>
+            </div>
         </div>
 
         <!-- Area Dashboard Pegawai -->
         <div id="dashboard-screen" class="hidden">
+            <!-- Status Koneksi Dashboard -->
+            <div id="dashboard-connection-status" class="mb-4 p-3 rounded-lg bg-slate-800 hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="ph-wifi-high mr-2 text-yellow-400"></i>
+                        <span class="text-sm text-yellow-400" id="connection-status-text">Memeriksa koneksi...</span>
+                    </div>
+                    <button onclick="checkConnection()" class="text-xs bg-slate-700 px-2 py-1 rounded hover:bg-slate-600">
+                        Coba Lagi
+                    </button>
+                </div>
+            </div>
+
             <!-- Biodata Pegawai -->
             <div id="user-info" class="mb-8 p-5 bg-slate-700 rounded-lg shadow-inner">
                 <h2 class="text-xl font-semibold mb-2 text-white">Selamat Datang, <span id="user-name"></span>!</h2>
@@ -111,23 +154,38 @@
 
             <!-- Tombol Absen -->
             <div class="mb-8">
-                <button id="absensi-btn" onclick="handleAttendance()" class="btn-primary w-full p-4 rounded-xl font-bold text-xl flex items-center justify-center transition-all duration-300">
+                <button id="absensi-btn" onclick="handleAttendance()" 
+                        class="btn-primary w-full p-4 rounded-xl font-bold text-xl flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                     <i class="ph-clock-countdown-bold text-2xl mr-2"></i>
                     <span>Absen Hari Ini</span>
                 </button>
                 <p id="absensi-status" class="text-center mt-3 font-medium"></p>
+                
+                <!-- Info Lokasi -->
+                <div id="location-info" class="mt-3 p-3 bg-slate-800 rounded-lg text-sm hidden">
+                    <div class="flex items-start">
+                        <i class="ph-info-bold mr-2 text-blue-400 mt-0.5"></i>
+                        <div>
+                            <p class="text-blue-400 font-medium">Tips Akses Lokasi:</p>
+                            <ul class="text-slate-400 mt-1 list-disc list-inside space-y-1">
+                                <li>Pastikan izin lokasi di browser diaktifkan</li>
+                                <li>Gunakan HTTPS untuk akses lokasi yang lebih baik</li>
+                                <li>Refresh halaman jika lokasi tidak terdeteksi</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Riwayat Absensi -->
             <h3 class="text-xl font-semibold mb-4 text-white border-b border-slate-700 pb-2">Riwayat Absensi Anda</h3>
             <div id="attendance-history" class="h-64 overflow-y-auto pr-2 custom-scroll">
-                <!-- Riwayat akan dimuat di sini -->
                 <p class="text-center text-slate-400 italic">Memuat riwayat...</p>
             </div>
 
             <!-- Tombol Logout -->
-            <button onclick="handleLogout()" class="mt-6 w-full text-slate-400 hover:text-red-400 transition-colors duration-200 text-sm">
-                Keluar
+            <button onclick="handleLogout()" class="mt-6 w-full text-slate-400 hover:text-red-400 transition-colors duration-200 text-sm flex items-center justify-center">
+                <i class="ph-sign-out-bold mr-2"></i> Keluar
             </button>
         </div>
     </div>
@@ -159,9 +217,9 @@
         let employeeData = {}; // Data pegawai dari Google Sheet
         let loggedInUser = null;
         let isAuthReady = false;
+        let isOnline = navigator.onLine;
         
         // --- Konfigurasi Lokasi Kantor ---
-        // Kantor: S 6°13′29.809″ (6.22494694) E 106°48′52.269″ (106.81451914)
         const TARGET_LAT = -6.22494694;
         const TARGET_LON = 106.81451914;
         const MAX_DISTANCE_M = 200; // Maksimal 200 meter
@@ -177,6 +235,10 @@
         const $dashboardScreen = document.getElementById('dashboard-screen');
         const $nipInput = document.getElementById('nip-input');
         const $loginError = document.getElementById('login-error');
+        const $connectionStatus = document.getElementById('connection-status');
+        const $dashboardConnectionStatus = document.getElementById('dashboard-connection-status');
+        const $connectionStatusText = document.getElementById('connection-status-text');
+        const $locationInfo = document.getElementById('location-info');
         const $userName = document.getElementById('user-name');
         const $userNip = document.getElementById('user-nip');
         const $userDept = document.getElementById('user-dept');
@@ -192,9 +254,51 @@
         // --- Utilities ---
         
         /**
+         * Mengecek status koneksi internet
+         */
+        function checkConnectionStatus() {
+            isOnline = navigator.onLine;
+            
+            if (!isOnline) {
+                updateConnectionStatus('Tidak terhubung ke internet', 'ph-wifi-slash', 'text-red-400');
+            } else {
+                updateConnectionStatus('Terhubung ke internet', 'ph-wifi-high', 'text-green-400');
+            }
+            
+            return isOnline;
+        }
+
+        /**
+         * Memperbarui tampilan status koneksi
+         */
+        function updateConnectionStatus(message, icon, colorClass) {
+            const elements = [$connectionStatus, $dashboardConnectionStatus];
+            
+            elements.forEach(element => {
+                if (element) {
+                    const iconElement = element.querySelector('i');
+                    const textElement = element.querySelector('span') || $connectionStatusText;
+                    
+                    if (iconElement) iconElement.className = `${icon} mr-2 ${colorClass}`;
+                    if (textElement) textElement.textContent = message;
+                    if (textElement) textElement.className = `text-sm ${colorClass}`;
+                    
+                    element.classList.remove('hidden');
+                }
+            });
+        }
+
+        /**
+         * Menyembunyikan status koneksi
+         */
+        function hideConnectionStatus() {
+            [$connectionStatus, $dashboardConnectionStatus].forEach(el => {
+                if (el) el.classList.add('hidden');
+            });
+        }
+
+        /**
          * Mengkonversi CSV string menjadi array of objects.
-         * @param {string} csvText 
-         * @returns {Object<string, Object>} Objek dengan NIP sebagai key
          */
         function csvToObjects(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim() !== '');
@@ -222,15 +326,10 @@
 
         /**
          * Menghitung jarak antara dua koordinat (Haversine Formula) dalam meter.
-         * @param {number} lat1 Latitude 1
-         * @param {number} lon1 Longitude 1
-         * @param {number} lat2 Latitude 2
-         * @param {number} lon2 Longitude 2
-         * @returns {number} Jarak dalam meter
          */
         function getDistance(lat1, lon1, lat2, lon2) {
             const R = 6371e3; // Radius bumi dalam meter
-            const φ1 = lat1 * Math.PI / 180; // φ, λ dalam radian
+            const φ1 = lat1 * Math.PI / 180;
             const φ2 = lat2 * Math.PI / 180;
             const Δφ = (lat2 - lat1) * Math.PI / 180;
             const Δλ = (lon2 - lon1) * Math.PI / 180;
@@ -245,10 +344,6 @@
 
         /**
          * Menampilkan modal status
-         * @param {string} text Teks yang akan ditampilkan
-         * @param {string} iconName Nama ikon (misal: 'ph-spinner-gap-bold', 'ph-check-circle-bold', 'ph-x-circle-bold')
-         * @param {string} iconColor Warna ikon (misal: 'text-light-blue', 'text-green-500', 'text-red-500')
-         * @param {boolean} showLoading true jika modal harus tetap tampil
          */
         function showModal(text, iconName, iconColor, showLoading = false) {
             $modalIcon.className = `text-5xl mb-4 ${iconColor}`;
@@ -261,10 +356,8 @@
 
             if (!showLoading) {
                 setTimeout(() => {
-                    $statusModal.classList.remove('opacity-100');
-                    $statusModal.classList.add('opacity-0');
-                    setTimeout(() => $statusModal.classList.add('hidden'), 300);
-                }, 3000); // 3 detik
+                    hideModal();
+                }, 3000);
             }
         }
 
@@ -292,17 +385,45 @@
         }
 
         /**
-         * Mengambil data pegawai dari Google Sheet (CSV)
+         * Mengambil data pegawai dari Google Sheet (CSV) dengan fallback
          */
         async function loadEmployeeData() {
             try {
+                // Cek koneksi terlebih dahulu
+                if (!checkConnectionStatus()) {
+                    throw new Error('Tidak ada koneksi internet');
+                }
+
+                showModal('Memuat data pegawai...', 'ph-database-bold', 'text-light-blue', true);
+                
                 const response = await fetch(EMPLOYEE_DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const csvText = await response.text();
                 employeeData = csvToObjects(csvText);
+                
+                hideModal();
                 console.log('Data Pegawai berhasil dimuat:', Object.keys(employeeData).length, 'pegawai');
                 return true;
             } catch (error) {
                 console.error('Gagal memuat data pegawai:', error);
+                
+                // Coba gunakan data dari localStorage sebagai fallback
+                const cachedData = localStorage.getItem('cached_employee_data');
+                if (cachedData) {
+                    try {
+                        employeeData = JSON.parse(cachedData);
+                        console.log('Menggunakan data pegawai cache:', Object.keys(employeeData).length, 'pegawai');
+                        showModal('Menggunakan data offline', 'ph-warning-bold', 'text-yellow-500');
+                        return true;
+                    } catch (e) {
+                        console.error('Gagal memuat cache data pegawai:', e);
+                    }
+                }
+                
+                showModal('Gagal memuat data pegawai', 'ph-x-circle-bold', 'text-red-500');
                 displayLoginError('Gagal memuat data pegawai. Cek koneksi Anda.');
                 return false;
             }
@@ -323,6 +444,9 @@
                 $userLevel.textContent = loggedInUser.LEVEL;
                 $userFirestoreId.textContent = userId;
                 
+                // Tampilkan info lokasi
+                $locationInfo.classList.remove('hidden');
+                
                 // Mulai listener rekapan
                 startAttendanceHistoryListener(loggedInUser.NIP);
                 checkIfAbsentToday();
@@ -334,7 +458,7 @@
                 loggedInUser = null;
                 $absensiStatus.textContent = '';
                 $absensiBtn.disabled = false;
-                $absensiBtn.classList.remove('bg-gray-500', 'hover:bg-gray-500');
+                $locationInfo.classList.add('hidden');
             }
         }
 
@@ -342,6 +466,11 @@
 
         function initFirebase() {
             try {
+                // Cek apakah konfigurasi Firebase valid
+                if (!firebaseConfig || !firebaseConfig.apiKey) {
+                    throw new Error('Konfigurasi Firebase tidak valid');
+                }
+
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -355,7 +484,7 @@
                             await loadEmployeeData();
                         }
                         
-                        // Periksa apakah user memiliki sesi NIP yang tersimpan (Simulasi Persistent Login)
+                        // Periksa apakah user memiliki sesi NIP yang tersimpan
                         const storedNip = localStorage.getItem('absensi_nip');
                         if (storedNip && employeeData[storedNip]) {
                             loggedInUser = employeeData[storedNip];
@@ -370,6 +499,7 @@
                     }
                 });
 
+                // Handle authentication
                 if (initialAuthToken) {
                     signInWithCustomToken(auth, initialAuthToken)
                         .catch(err => {
@@ -379,16 +509,37 @@
                 } else {
                     signInAnonymously(auth);
                 }
+
+                // Sembunyikan status koneksi setelah Firebase berhasil
+                setTimeout(() => {
+                    if (isOnline) {
+                        hideConnectionStatus();
+                    }
+                }, 3000);
+
             } catch (e) {
                 console.error("Gagal inisialisasi Firebase:", e);
+                updateConnectionStatus('Kesalahan sistem: Gagal terhubung ke layanan data', 'ph-warning-circle', 'text-red-400');
                 displayLoginError("Kesalahan sistem: Gagal terhubung ke layanan data.");
             }
         }
 
-        // --- Login & Logout Handlers ---
+        // --- Event Handlers ---
+
+        window.handleNipEnter = function(event) {
+            if (event.key === 'Enter') {
+                handleLogin();
+            }
+        }
+
+        window.checkConnection = function() {
+            checkConnectionStatus();
+        }
 
         window.handleLogin = async function() {
             clearLoginError();
+            hideConnectionStatus();
+            
             const nip = $nipInput.value.trim().toUpperCase();
             
             if (!nip) {
@@ -396,54 +547,63 @@
                 return;
             }
 
-            if (Object.keys(employeeData).length === 0) {
-                $loginError.textContent = 'Memuat data pegawai... tunggu sebentar.';
-                await loadEmployeeData();
-            }
+            // Tampilkan loading
+            const loginBtn = document.getElementById('login-btn');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="ph-spinner-gap-bold animate-spin mr-2"></i> Memeriksa...';
+            loginBtn.disabled = true;
 
-            const user = employeeData[nip];
-            
-            if (user) {
-                loggedInUser = user;
-                localStorage.setItem('absensi_nip', nip);
-                updateScreen(true);
-            } else {
-                displayLoginError('NIP tidak ditemukan. Pastikan NIP sudah benar.');
+            try {
+                if (Object.keys(employeeData).length === 0) {
+                    await loadEmployeeData();
+                }
+
+                const user = employeeData[nip];
+                
+                if (user) {
+                    loggedInUser = user;
+                    localStorage.setItem('absensi_nip', nip);
+                    // Simpan data ke cache
+                    localStorage.setItem('cached_employee_data', JSON.stringify(employeeData));
+                    updateScreen(true);
+                } else {
+                    displayLoginError('NIP tidak ditemukan. Pastikan NIP sudah benar.');
+                }
+            } catch (error) {
+                displayLoginError('Terjadi kesalahan saat login.');
+            } finally {
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
             }
         }
 
         window.handleLogout = async function() {
             localStorage.removeItem('absensi_nip');
             loggedInUser = null;
-            await signOut(auth);
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('Error saat logout:', error);
+            }
             updateScreen(false);
             $historyContainer.innerHTML = '<p class="text-center text-slate-400 italic">Riwayat telah dikosongkan.</p>';
         }
 
-
         // --- Firestore Attendance Logic ---
 
-        /**
-         * Mendapatkan path koleksi absensi untuk user saat ini.
-         */
         function getAttendanceCollectionRef() {
             if (!db || !userId) throw new Error("Firebase atau User ID belum siap.");
-            // Path: /artifacts/{appId}/users/{userId}/attendance_records
             return collection(db, 'artifacts', appId, 'users', userId, 'attendance_records');
         }
 
-        /**
-         * Memeriksa apakah pegawai sudah absen hari ini
-         */
         async function checkIfAbsentToday() {
             if (!isAuthReady || !userId || !db) return;
 
-            const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+            const today = new Date().toISOString().split('T')[0];
             
             $absensiStatus.className = 'text-center mt-3 font-medium text-slate-400';
             $absensiStatus.textContent = 'Memeriksa status absensi...';
             $absensiBtn.disabled = true;
-            $absensiBtn.classList.add('bg-gray-500');
 
             try {
                 const q = query(getAttendanceCollectionRef(), where('date', '==', today), limit(1));
@@ -452,36 +612,26 @@
                 if (!querySnapshot.empty) {
                     $absensiStatus.textContent = 'Anda sudah absen hari ini. Terima kasih!';
                     $absensiStatus.classList.replace('text-slate-400', 'text-green-400');
-                    $absensiBtn.textContent = 'Sudah Absen';
+                    $absensiBtn.innerHTML = '<i class="ph-check-circle-bold text-2xl mr-2"></i><span>Sudah Absen</span>';
                     $absensiBtn.disabled = true;
                 } else {
                     $absensiStatus.textContent = 'Anda belum absen hari ini. Klik tombol di atas.';
                     $absensiStatus.classList.replace('text-slate-400', 'text-yellow-400');
                     $absensiBtn.innerHTML = '<i class="ph-clock-countdown-bold text-2xl mr-2"></i><span>Absen Hari Ini</span>';
                     $absensiBtn.disabled = false;
-                    $absensiBtn.classList.remove('bg-gray-500', 'hover:bg-gray-500');
                 }
             } catch (error) {
                 console.error("Gagal memeriksa status absensi:", error);
                 $absensiStatus.textContent = 'Gagal memuat status absensi.';
                 $absensiStatus.classList.replace('text-slate-400', 'text-red-400');
                 $absensiBtn.disabled = false;
-                $absensiBtn.classList.remove('bg-gray-500', 'hover:bg-gray-500');
             }
         }
 
-        /**
-         * Memulai listener untuk riwayat absensi
-         * @param {string} nip pegawai
-         */
         function startAttendanceHistoryListener(nip) {
             if (!isAuthReady || !userId || !db) return;
             
-            // Query 10 riwayat terakhir
-            // Catatan: Karena ada masalah indexing di Canvas, kita ambil data lalu sorting secara manual
-            // const q = query(getAttendanceCollectionRef(), orderBy('timestamp', 'desc'), limit(10));
-            
-            const q = query(getAttendanceCollectionRef(), limit(100)); // Ambil lebih banyak untuk sorting lokal
+            const q = query(getAttendanceCollectionRef(), limit(100));
 
             onSnapshot(q, (snapshot) => {
                 let records = [];
@@ -489,10 +639,7 @@
                     records.push(doc.data());
                 });
 
-                // Sortir data secara manual di JavaScript (descending timestamp)
                 records.sort((a, b) => b.timestamp - a.timestamp);
-                
-                // Batasi hanya 10 data teratas setelah sorting
                 records = records.slice(0, 10);
 
                 let html = '';
@@ -527,7 +674,7 @@
             });
         }
 
-        // --- Attendance Handler ---
+        // --- Improved Attendance Handler ---
 
         window.handleAttendance = async function() {
             if (!loggedInUser || !userId || !db) {
@@ -535,7 +682,12 @@
                 return;
             }
             
-            // Status Awal
+            // Cek koneksi terlebih dahulu
+            if (!checkConnectionStatus()) {
+                showModal('Tidak ada koneksi internet. Periksa koneksi Anda.', 'ph-wifi-slash-bold', 'text-red-500');
+                return;
+            }
+
             showModal('Sedang memproses absensi...', 'ph-spinner-gap-bold', 'text-light-blue', true);
             $absensiBtn.disabled = true;
 
@@ -547,26 +699,32 @@
 
                 if (!querySnapshot.empty) {
                     showModal('Anda sudah absen hari ini. Absensi dibatalkan.', 'ph-info-bold', 'text-yellow-400');
-                    await checkIfAbsentToday(); // Update status UI
+                    await checkIfAbsentToday();
                     return;
                 }
 
-                // 2. Get Geolocation
+                // 2. Get Geolocation dengan error handling yang lebih baik
                 showModal('Mendapatkan lokasi Anda...', 'ph-map-pin-line-bold', 'text-light-blue', true);
                 
                 const position = await new Promise((resolve, reject) => {
                     if (!navigator.geolocation) {
-                        return reject(new Error("Geolocation tidak didukung di browser Anda."));
+                        reject(new Error("Geolocation tidak didukung di browser Anda."));
+                        return;
                     }
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true, 
-                        timeout: 10000, 
+
+                    // Timeout yang lebih lama untuk lokasi
+                    const options = {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
                         maximumAge: 0
-                    });
+                    };
+
+                    navigator.geolocation.getCurrentPosition(resolve, reject, options);
                 });
 
                 const userLat = position.coords.latitude;
                 const userLon = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
                 const distance = getDistance(userLat, userLon, TARGET_LAT, TARGET_LON);
                 const inProximity = distance <= MAX_DISTANCE_M;
                 const timestamp = new Date().getTime();
@@ -579,73 +737,98 @@
                     level: loggedInUser.LEVEL,
                     lat: userLat,
                     lon: userLon,
+                    accuracy: accuracy,
                     distance: parseFloat(distance.toFixed(2)),
                     inProximity: inProximity,
                     timestamp: timestamp,
-                    date: today, // Untuk query harian
+                    date: today,
                     firestoreUserId: userId,
                 };
                 
-                // 4. Submit ke Google Apps Script
-                showModal('Mengirim data ke server...', 'ph-cloud-arrow-up-bold', 'text-light-blue', true);
+                // 4. Submit ke Google Apps Script (jika online)
+                if (isOnline) {
+                    showModal('Mengirim data ke server...', 'ph-cloud-arrow-up-bold', 'text-light-blue', true);
+                    
+                    try {
+                        const params = new URLSearchParams();
+                        Object.keys(attendanceRecord).forEach(key => {
+                            params.append(key, attendanceRecord[key]);
+                        });
 
-                const params = new URLSearchParams(attendanceRecord).toString();
-                const gScriptUrlWithParams = `${GSCRIPT_LOG_URL}?${params}`;
+                        const gScriptResponse = await fetch(GSCRIPT_LOG_URL, {
+                            method: 'POST',
+                            body: params,
+                            mode: 'no-cors'
+                        });
+                        // Note: no-cors mode, kita tidak bisa membaca response
+                    } catch (scriptError) {
+                        console.warn('Gagal mengirim ke Google Script, melanjutkan dengan Firestore saja:', scriptError);
+                    }
+                }
 
-                // Kirim data ke Google Sheet (Apps Script)
-                const gScriptResponse = await fetch(gScriptUrlWithParams, { method: 'GET', mode: 'no-cors' });
-                // Note: Karena menggunakan 'no-cors', kita tidak bisa membaca respons, 
-                // hanya memastikan fetch berjalan tanpa error.
-
-                // 5. Simpan ke Firestore (untuk dashboard dan cek harian)
-                // Menggunakan addDoc untuk membuat ID unik
+                // 5. Simpan ke Firestore
                 await addDoc(getAttendanceCollectionRef(), attendanceRecord);
 
                 // 6. Success
+                const accuracyInfo = accuracy <= 50 ? '' : ` (Akurasi: ±${Math.round(accuracy)}m)`;
                 const message = inProximity ? 
-                    `Terima kasih sudah absen hari ini! Jarak Anda: ${distance.toFixed(2)}m.` : 
-                    `Absensi tercatat, namun Anda berada di luar area kantor (Jarak: ${distance.toFixed(2)}m).`;
+                    `Absensi berhasil! Jarak: ${distance.toFixed(2)}m${accuracyInfo}` : 
+                    `Absensi tercatat! Anda di luar area (${distance.toFixed(2)}m)${accuracyInfo}`;
                 
-                showModal(message, inProximity ? 'ph-check-circle-bold' : 'ph-warning-bold', inProximity ? 'text-green-500' : 'text-red-500');
+                showModal(message, inProximity ? 'ph-check-circle-bold' : 'ph-warning-bold', inProximity ? 'text-green-500' : 'text-yellow-500');
 
             } catch (error) {
-                // PERBAIKAN: Menggunakan stringify dengan properti agar output console tidak ganda ({})
-                const errorDetails = JSON.stringify(error, Object.getOwnPropertyNames(error)) || error.toString();
-                console.error("Kesalahan proses absensi (detail): " + errorDetails);
+                console.error("Kesalahan proses absensi:", error);
                 
                 let errorMessage = 'Terjadi kesalahan tidak terduga saat absen.';
                 
-                // Gunakan pesan error yang aman, default ke string jika tidak ada properti message
-                const errorString = error.message || (error.toString().includes('[object') ? 'Kesalahan Geolocation/API.' : error.toString());
-                
-                if (error.code === 1 || errorString.toLowerCase().includes('permission')) {
-                    errorMessage = 'Akses Geolocation ditolak. Harap izinkan lokasi untuk absen.';
-                } else if (errorString.toLowerCase().includes('timeout')) {
-                    errorMessage = 'Gagal mendapatkan lokasi: Waktu habis.';
+                if (error.code === 1) {
+                    errorMessage = 'Akses lokasi ditolak. Izinkan akses lokasi di browser Anda.';
+                } else if (error.code === 2) {
+                    errorMessage = 'Lokasi tidak tersedia. Pastikan GPS/Location Services aktif.';
+                } else if (error.code === 3) {
+                    errorMessage = 'Waktu permintaan lokasi habis. Coba lagi.';
+                } else if (error.message?.includes('permission') || error.message?.includes('denied')) {
+                    errorMessage = 'Izin lokasi ditolak. Berikan izin lokasi untuk aplikasi ini.';
+                } else if (error.message?.includes('timeout')) {
+                    errorMessage = 'Waktu permintaan lokasi habis. Pastikan GPS/Location Services aktif.';
+                } else if (error.message?.includes('not supported')) {
+                    errorMessage = 'Browser tidak mendukung geolocation. Gunakan browser modern.';
                 } else {
-                    // Jika errorString masih generic, berikan pesan yang lebih deskriptif
-                    if (errorString.includes('object')) {
-                        errorMessage = 'Gagal mendapatkan lokasi. Pastikan koneksi dan izin lokasi sudah aktif.';
-                    } else {
-                        errorMessage = `Gagal: ${errorString}`;
-                    }
+                    errorMessage = `Gagal: ${error.message || 'Tidak dapat mengakses lokasi'}`;
                 }
                 
                 showModal(errorMessage, 'ph-x-circle-bold', 'text-red-500');
 
             } finally {
-                // Selalu panggil setelah 3 detik berlalu atau setelah error muncul
                 setTimeout(() => {
-                    checkIfAbsentToday(); // Pengecekan ulang status dan mengaktifkan/menonaktifkan tombol
-                }, 3000);
+                    checkIfAbsentToday();
+                }, 2000);
             }
         }
 
+        // --- Event Listeners untuk Koneksi ---
+        window.addEventListener('online', () => {
+            isOnline = true;
+            checkConnectionStatus();
+            setTimeout(() => hideConnectionStatus(), 3000);
+        });
+
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            checkConnectionStatus();
+        });
 
         // --- Startup ---
         window.onload = async () => {
-            await loadEmployeeData(); // Muat data pegawai saat startup
-            initFirebase();           // Inisialisasi Firebase
+            // Cek koneksi awal
+            checkConnectionStatus();
+            
+            // Muat data pegawai
+            await loadEmployeeData();
+            
+            // Inisialisasi Firebase
+            initFirebase();
         };
 
     </script>
