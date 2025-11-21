@@ -105,7 +105,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3 text-center">
-                        <img src="https://via.placeholder.com/100" class="profile-img" alt="Profile">
+                        <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff&size=100" class="profile-img" alt="Profile">
                     </div>
                     <div class="col-md-9">
                         <div class="row mb-2">
@@ -231,8 +231,8 @@
         const DATA_ABSEN_URL = 'https://script.google.com/macros/s/AKfycby6cI35aYgKScfFD8ugnHb6IQjEj0wfoC45ES0BkXbLyKkTnEaLDHoj-lp0YXH9qhbB/exec';
 
         // Koordinat kantor
-        const KANTOR_LAT = -6.22494694; // 6°13′29.809″S
-        const KANTOR_LNG = 106.814519;  // 106°48′52.269″E
+        const KANTOR_LAT = -6.22494694;
+        const KANTOR_LNG = 106.814519;
         const MAX_DISTANCE = 0.2; // 200 meter
 
         // Elemen DOM
@@ -268,15 +268,20 @@
         // Fungsi untuk mengambil data dari Google Sheets
         async function fetchData(url) {
             try {
-                const response = await fetch(url);
+                // Tambahkan timestamp untuk menghindari cache
+                const cacheBuster = `&t=${new Date().getTime()}`;
+                const response = await fetch(url + cacheBuster);
+                
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json();
+                
+                const text = await response.text();
+                const data = JSON.parse(text);
                 return data;
             } catch (error) {
                 console.error('Error fetching data:', error);
-                throw error;
+                throw new Error('Gagal mengambil data dari server');
             }
         }
 
@@ -292,14 +297,15 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const result = await response.json();
+                const text = await response.text();
+                const result = JSON.parse(text);
                 return result;
             } catch (error) {
                 console.error('Error submitting absen:', error);
-                throw error;
+                throw new Error('Gagal mengirim data absen');
             }
         }
 
@@ -344,7 +350,15 @@
                     },
                     error => {
                         console.error("Error getting location:", error);
-                        locationStatus.innerHTML = `<div class="alert alert-warning py-2"><i class="fas fa-exclamation-triangle me-2"></i> Tidak dapat mengakses lokasi. Pastikan izin lokasi diaktifkan.</div>`;
+                        let errorMessage = 'Tidak dapat mengakses lokasi';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            errorMessage = 'Izin lokasi ditolak. Silakan aktifkan izin lokasi di browser Anda.';
+                        } else if (error.code === error.POSITION_UNAVAILABLE) {
+                            errorMessage = 'Informasi lokasi tidak tersedia.';
+                        } else if (error.code === error.TIMEOUT) {
+                            errorMessage = 'Permintaan lokasi timeout.';
+                        }
+                        locationStatus.innerHTML = `<div class="alert alert-warning py-2"><i class="fas fa-exclamation-triangle me-2"></i> ${errorMessage}</div>`;
                         absenBtn.disabled = true;
                     },
                     {
@@ -393,7 +407,9 @@
                 }
                 
                 // Cari user berdasarkan NIP
-                const user = dataPegawai.find(pegawai => pegawai.nip === nip);
+                const user = dataPegawai.find(pegawai => 
+                    pegawai.nip && pegawai.nip.toString() === nip
+                );
                 
                 if (user) {
                     currentUser = user;
@@ -501,11 +517,15 @@
             loginSection.style.display = 'none';
             dashboardSection.style.display = 'block';
             
+            // Update gambar profil berdasarkan nama
+            const profileImg = document.querySelector('.profile-img');
+            profileImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.nama)}&background=0D8ABC&color=fff&size=100`;
+            
             // Isi profil
-            profileNip.textContent = currentUser.nip;
-            profileNama.textContent = currentUser.nama;
-            profileDepartment.textContent = currentUser.department;
-            profileLevel.textContent = currentUser.level;
+            profileNip.textContent = currentUser.nip || '-';
+            profileNama.textContent = currentUser.nama || '-';
+            profileDepartment.textContent = currentUser.department || '-';
+            profileLevel.textContent = currentUser.level || '-';
             
             // Update waktu
             updateTime();
@@ -513,7 +533,7 @@
             
             // Cek lokasi
             checkLocation();
-            setInterval(checkLocation, 30000); // Cek setiap 30 detik
+            setInterval(checkLocation, 30000);
             
             // Ambil data absen
             await loadAbsenData();
@@ -555,14 +575,20 @@
         // Update tabel absen
         function updateAbsenTable() {
             // Filter data absen untuk user saat ini
-            const userAbsen = dataAbsen.filter(absen => absen.nip === currentUser.nip);
+            const userAbsen = dataAbsen.filter(absen => 
+                absen.nip && absen.nip.toString() === currentUser.nip.toString()
+            );
             
             // Data bulan ini
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
             const absenBulanIniData = userAbsen.filter(absen => {
-                const absenDate = new Date(absen.tanggal);
-                return absenDate.getMonth() === currentMonth && absenDate.getFullYear() === currentYear;
+                try {
+                    const absenDate = new Date(absen.tanggal);
+                    return absenDate.getMonth() === currentMonth && absenDate.getFullYear() === currentYear;
+                } catch (e) {
+                    return false;
+                }
             });
             
             // Isi tabel bulan ini
@@ -570,13 +596,16 @@
             if (absenBulanIniData.length === 0) {
                 absenBulanIni.innerHTML = '<tr><td colspan="4" class="text-center">Tidak ada data absen bulan ini</td></tr>';
             } else {
+                // Urutkan berdasarkan tanggal (terbaru di atas)
+                absenBulanIniData.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+                
                 absenBulanIniData.forEach(absen => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(absen.tanggal)}</td>
-                        <td>${absen.waktu}</td>
-                        <td>${absen.lokasi}</td>
-                        <td><span class="badge bg-success">${absen.status}</span></td>
+                        <td>${absen.waktu || '-'}</td>
+                        <td>${absen.lokasi || '-'}</td>
+                        <td><span class="badge bg-success">${absen.status || 'Hadir'}</span></td>
                     `;
                     absenBulanIni.appendChild(row);
                 });
@@ -587,13 +616,16 @@
             if (userAbsen.length === 0) {
                 absenSemua.innerHTML = '<tr><td colspan="4" class="text-center">Tidak ada data absen</td></tr>';
             } else {
+                // Urutkan berdasarkan tanggal (terbaru di atas)
+                userAbsen.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+                
                 userAbsen.forEach(absen => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(absen.tanggal)}</td>
-                        <td>${absen.waktu}</td>
-                        <td>${absen.lokasi}</td>
-                        <td><span class="badge bg-success">${absen.status}</span></td>
+                        <td>${absen.waktu || '-'}</td>
+                        <td>${absen.lokasi || '-'}</td>
+                        <td><span class="badge bg-success">${absen.status || 'Hadir'}</span></td>
                     `;
                     absenSemua.appendChild(row);
                 });
@@ -602,8 +634,12 @@
 
         // Format tanggal
         function formatDate(dateString) {
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
+            try {
+                const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            } catch (e) {
+                return dateString;
+            }
         }
 
         // Inisialisasi
