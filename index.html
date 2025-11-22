@@ -17,7 +17,6 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             border: none;
-            backdrop-filter: blur(10px);
             background: rgba(255, 255, 255, 0.95);
         }
         .login-container {
@@ -67,7 +66,6 @@
             z-index: 9999;
             color: white;
             flex-direction: column;
-            backdrop-filter: blur(5px);
         }
         .spinner-border {
             width: 4rem;
@@ -387,14 +385,18 @@
         let dataPegawai = [];
         let dataAbsen = [];
 
-        // Fungsi untuk mengambil data dari Google Sheets
+        // Fungsi untuk mengambil data dari Google Sheets - DIPERBAIKI
         async function fetchData(url) {
             try {
-                // Tambahkan timestamp untuk menghindari cache
-                const cacheBuster = `?t=${new Date().getTime()}`;
-                const response = await fetch(url + cacheBuster, {
+                console.log('Mengambil data dari:', url);
+                
+                // Gunakan approach yang berbeda untuk Google Apps Script
+                const response = await fetch(url, {
                     method: 'GET',
-                    mode: 'no-cors' // Mode no-cors untuk menghindari CORS issues
+                    mode: 'cors', // Ubah ke cors
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
                 });
                 
                 if (!response.ok) {
@@ -402,32 +404,51 @@
                 }
                 
                 const text = await response.text();
-                const data = JSON.parse(text);
+                console.log('Response text:', text);
+                
+                // Coba parse JSON
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    throw new Error('Format data tidak valid');
+                }
+                
                 return data;
             } catch (error) {
                 console.error('Error fetching data:', error);
-                throw new Error('Gagal mengambil data dari server');
+                throw new Error('Gagal mengambil data dari server: ' + error.message);
             }
         }
 
-        // Fungsi untuk mengirim data absen ke Google Sheets
+        // Fungsi untuk mengirim data absen ke Google Sheets - DIPERBAIKI
         async function submitAbsen(absenData) {
             try {
-                // Untuk Google Apps Script, kita bisa menggunakan form submission
-                const formData = new FormData();
+                console.log('Mengirim data absen:', absenData);
+                
+                // Buat URL dengan parameter query untuk Google Apps Script
+                const params = new URLSearchParams();
                 Object.keys(absenData).forEach(key => {
-                    formData.append(key, absenData[key]);
+                    params.append(key, absenData[key]);
                 });
-
-                const response = await fetch(DATA_ABSEN_URL, {
-                    method: 'POST',
-                    body: formData
+                
+                const response = await fetch(DATA_ABSEN_URL + '?' + params.toString(), {
+                    method: 'GET', // Gunakan GET untuk menghindari CORS issues
+                    mode: 'cors'
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.text();
+                console.log('Response submit absen:', result);
                 
                 return { status: 'success', message: 'Data berhasil disimpan' };
             } catch (error) {
                 console.error('Error submitting absen:', error);
-                throw new Error('Gagal mengirim data absen');
+                throw new Error('Gagal mengirim data absen: ' + error.message);
             }
         }
 
@@ -509,7 +530,7 @@
             return R * c;
         }
 
-        // Proses login
+        // Proses login - DIPERBAIKI
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const nip = nipInput.value.trim();
@@ -524,25 +545,36 @@
             loginError.style.display = 'none';
             
             try {
+                console.log('Memulai proses login untuk NIP:', nip);
+                
                 // Ambil data pegawai dari Google Sheets
                 if (dataPegawai.length === 0) {
+                    console.log('Mengambil data pegawai dari server...');
                     dataPegawai = await fetchData(DATA_PEGAWAI_URL);
+                    console.log('Data pegawai berhasil diambil:', dataPegawai);
                 }
                 
-                // Cari user berdasarkan NIP
-                const user = dataPegawai.find(pegawai => 
-                    pegawai.nip && pegawai.nip.toString() === nip
-                );
+                // Cari user berdasarkan NIP - DIPERBAIKI
+                const user = dataPegawai.find(pegawai => {
+                    // Handle berbagai format NIP (string, number)
+                    const pegawaiNip = pegawai.nip ? pegawai.nip.toString().trim() : '';
+                    const inputNip = nip.toString().trim();
+                    console.log('Mencocokkan:', pegawaiNip, 'dengan', inputNip);
+                    return pegawaiNip === inputNip;
+                });
                 
                 if (user) {
+                    console.log('User ditemukan:', user);
                     currentUser = user;
                     await showDashboard();
                 } else {
-                    showLoginError('NIP tidak ditemukan!');
+                    console.log('User tidak ditemukan untuk NIP:', nip);
+                    console.log('Data pegawai yang tersedia:', dataPegawai);
+                    showLoginError('NIP tidak ditemukan! Pastikan NIP yang dimasukkan benar.');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showLoginError('Terjadi kesalahan saat memuat data. Silakan coba lagi.');
+                showLoginError('Terjadi kesalahan saat memuat data: ' + error.message);
             } finally {
                 loginLoading.style.display = 'none';
             }
@@ -561,7 +593,7 @@
             showLogin();
         });
 
-        // Proses absen
+        // Proses absen - DIPERBAIKI
         absenBtn.addEventListener('click', async function() {
             // Sembunyikan pesan error sebelumnya
             absenError.style.display = 'none';
@@ -598,6 +630,8 @@
                     status: 'Hadir'
                 };
                 
+                console.log('Mengirim data absen:', absenData);
+                
                 // Kirim data absen ke Google Sheets
                 await submitAbsen(absenData);
                 
@@ -626,7 +660,7 @@
             } catch (error) {
                 console.error('Absen error:', error);
                 loadingOverlay.style.display = 'none';
-                showAbsenError('Gagal melakukan absen. Silakan coba lagi.');
+                showAbsenError('Gagal melakukan absen: ' + error.message);
             }
         });
 
@@ -669,7 +703,7 @@
             // Cek apakah sudah absen hari ini
             const today = new Date().toISOString().split('T')[0];
             const sudahAbsen = dataAbsen.some(absen => 
-                absen.nip === currentUser.nip && absen.tanggal === today
+                absen.nip && absen.nip.toString() === currentUser.nip.toString() && absen.tanggal === today
             );
             
             if (sudahAbsen) {
@@ -681,7 +715,9 @@
         // Memuat data absen
         async function loadAbsenData() {
             try {
+                console.log('Memuat data absen...');
                 dataAbsen = await fetchData(DATA_ABSEN_URL);
+                console.log('Data absen berhasil dimuat:', dataAbsen);
             } catch (error) {
                 console.error('Error loading absen data:', error);
                 // Tetap lanjutkan dengan data absen kosong
@@ -724,6 +760,8 @@
             loginSection.style.display = 'block';
             nipInput.value = '';
             loginError.style.display = 'none';
+            // Fokus ke input NIP
+            setTimeout(() => nipInput.focus(), 100);
         }
 
         // Update tabel absen
