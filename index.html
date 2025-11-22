@@ -387,13 +387,35 @@
 
         // Fungsi untuk mengambil data dari Google Sheets - DIPERBAIKI
         async function fetchData(url) {
-            try {
-                console.log('Mengambil data dari:', url);
+            return new Promise((resolve, reject) => {
+                // Gunakan JSONP approach untuk menghindari CORS
+                const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+                const script = document.createElement('script');
                 
-                // Gunakan approach yang berbeda untuk Google Apps Script
-                const response = await fetch(url, {
+                window[callbackName] = function(data) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(data);
+                };
+
+                script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+                script.onerror = function() {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject(new Error('JSONP request failed'));
+                };
+
+                document.body.appendChild(script);
+            });
+        }
+
+        // Alternative approach menggunakan proxy CORS
+        async function fetchDataWithProxy(url) {
+            try {
+                // Gunakan CORS proxy
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxyUrl + url, {
                     method: 'GET',
-                    mode: 'cors', // Ubah ke cors
                     headers: {
                         'Content-Type': 'application/json',
                     }
@@ -406,7 +428,6 @@
                 const text = await response.text();
                 console.log('Response text:', text);
                 
-                // Coba parse JSON
                 let data;
                 try {
                     data = JSON.parse(text);
@@ -417,35 +438,85 @@
                 
                 return data;
             } catch (error) {
-                console.error('Error fetching data:', error);
-                throw new Error('Gagal mengambil data dari server: ' + error.message);
+                console.error('Error fetching data with proxy:', error);
+                throw error;
             }
         }
 
-        // Fungsi untuk mengirim data absen ke Google Sheets - DIPERBAIKI
+        // Fallback menggunakan XMLHttpRequest
+        function fetchDataWithXHR(url) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                resolve(data);
+                            } catch (e) {
+                                reject(new Error('Failed to parse JSON'));
+                            }
+                        } else {
+                            reject(new Error(`HTTP error! status: ${xhr.status}`));
+                        }
+                    }
+                };
+                xhr.onerror = function() {
+                    reject(new Error('Network error'));
+                };
+                xhr.send();
+            });
+        }
+
+        // Fungsi utama untuk fetch data dengan multiple fallbacks
+        async function fetchDataMain(url) {
+            try {
+                console.log('Mencoba approach 1: JSONP');
+                return await fetchData(url);
+            } catch (error1) {
+                console.log('Approach 1 gagal, mencoba approach 2: CORS Proxy');
+                try {
+                    return await fetchDataWithProxy(url);
+                } catch (error2) {
+                    console.log('Approach 2 gagal, mencoba approach 3: XHR');
+                    try {
+                        return await fetchDataWithXHR(url);
+                    } catch (error3) {
+                        console.log('Semua approach gagal');
+                        throw new Error('Tidak dapat terhubung ke server. Pastikan koneksi internet stabil.');
+                    }
+                }
+            }
+        }
+
+        // Fungsi untuk mengirim data absen ke Google Sheets
         async function submitAbsen(absenData) {
             try {
                 console.log('Mengirim data absen:', absenData);
                 
-                // Buat URL dengan parameter query untuk Google Apps Script
+                // Buat URL dengan parameter query
                 const params = new URLSearchParams();
                 Object.keys(absenData).forEach(key => {
-                    params.append(key, absenData[key]);
+                    if (absenData[key]) {
+                        params.append(key, absenData[key]);
+                    }
                 });
                 
-                const response = await fetch(DATA_ABSEN_URL + '?' + params.toString(), {
-                    method: 'GET', // Gunakan GET untuk menghindari CORS issues
-                    mode: 'cors'
+                const urlWithParams = DATA_ABSEN_URL + '?' + params.toString();
+                
+                // Gunakan image approach untuk menghindari CORS
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = function() {
+                        resolve({ status: 'success', message: 'Data berhasil disimpan' });
+                    };
+                    img.onerror = function() {
+                        reject(new Error('Gagal mengirim data'));
+                    };
+                    img.src = urlWithParams;
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.text();
-                console.log('Response submit absen:', result);
-                
-                return { status: 'success', message: 'Data berhasil disimpan' };
             } catch (error) {
                 console.error('Error submitting absen:', error);
                 throw new Error('Gagal mengirim data absen: ' + error.message);
@@ -550,13 +621,12 @@
                 // Ambil data pegawai dari Google Sheets
                 if (dataPegawai.length === 0) {
                     console.log('Mengambil data pegawai dari server...');
-                    dataPegawai = await fetchData(DATA_PEGAWAI_URL);
+                    dataPegawai = await fetchDataMain(DATA_PEGAWAI_URL);
                     console.log('Data pegawai berhasil diambil:', dataPegawai);
                 }
                 
-                // Cari user berdasarkan NIP - DIPERBAIKI
+                // Cari user berdasarkan NIP
                 const user = dataPegawai.find(pegawai => {
-                    // Handle berbagai format NIP (string, number)
                     const pegawaiNip = pegawai.nip ? pegawai.nip.toString().trim() : '';
                     const inputNip = nip.toString().trim();
                     console.log('Mencocokkan:', pegawaiNip, 'dengan', inputNip);
@@ -569,12 +639,11 @@
                     await showDashboard();
                 } else {
                     console.log('User tidak ditemukan untuk NIP:', nip);
-                    console.log('Data pegawai yang tersedia:', dataPegawai);
                     showLoginError('NIP tidak ditemukan! Pastikan NIP yang dimasukkan benar.');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showLoginError('Terjadi kesalahan saat memuat data: ' + error.message);
+                showLoginError('Terjadi kesalahan: ' + error.message);
             } finally {
                 loginLoading.style.display = 'none';
             }
@@ -593,12 +662,10 @@
             showLogin();
         });
 
-        // Proses absen - DIPERBAIKI
+        // Proses absen
         absenBtn.addEventListener('click', async function() {
-            // Sembunyikan pesan error sebelumnya
             absenError.style.display = 'none';
             
-            // Validasi lokasi
             if (!userLocation) {
                 showAbsenError('Lokasi tidak terdeteksi. Silakan refresh halaman dan berikan izin akses lokasi.');
                 return;
@@ -614,7 +681,6 @@
                 return;
             }
             
-            // Tampilkan loading
             loadingOverlay.style.display = 'flex';
             
             try {
@@ -630,29 +696,18 @@
                     status: 'Hadir'
                 };
                 
-                console.log('Mengirim data absen:', absenData);
-                
-                // Kirim data absen ke Google Sheets
                 await submitAbsen(absenData);
                 
-                // Sembunyikan loading
                 loadingOverlay.style.display = 'none';
-                
-                // Tampilkan sukses
                 successOverlay.style.display = 'flex';
                 
-                // Tambahkan ke data absen lokal
                 dataAbsen.push(absenData);
-                
-                // Update dashboard
                 updateAbsenTable();
                 updateStats();
                 
-                // Nonaktifkan tombol absen
                 absenBtn.disabled = true;
                 absenSuccess.style.display = 'block';
                 
-                // Sembunyikan sukses setelah 3 detik
                 setTimeout(() => {
                     successOverlay.style.display = 'none';
                 }, 3000);
@@ -675,32 +730,24 @@
             loginSection.style.display = 'none';
             dashboardSection.style.display = 'block';
             
-            // Update gambar profil berdasarkan nama
             const nameForAvatar = currentUser.nama || 'User';
             profilePicture.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar)}&background=0D8ABC&color=fff&size=120&bold=true`;
             
-            // Isi profil
             profileNip.textContent = currentUser.nip || '-';
             profileNama.textContent = currentUser.nama || '-';
             profileDepartment.textContent = currentUser.department || '-';
             profileLevel.textContent = currentUser.level || '-';
             
-            // Update waktu
             updateTime();
             setInterval(updateTime, 1000);
             
-            // Cek lokasi
             checkLocation();
             setInterval(checkLocation, 30000);
             
-            // Ambil data absen
             await loadAbsenData();
-            
-            // Update tabel absen
             updateAbsenTable();
             updateStats();
             
-            // Cek apakah sudah absen hari ini
             const today = new Date().toISOString().split('T')[0];
             const sudahAbsen = dataAbsen.some(absen => 
                 absen.nip && absen.nip.toString() === currentUser.nip.toString() && absen.tanggal === today
@@ -716,11 +763,10 @@
         async function loadAbsenData() {
             try {
                 console.log('Memuat data absen...');
-                dataAbsen = await fetchData(DATA_ABSEN_URL);
+                dataAbsen = await fetchDataMain(DATA_ABSEN_URL);
                 console.log('Data absen berhasil dimuat:', dataAbsen);
             } catch (error) {
                 console.error('Error loading absen data:', error);
-                // Tetap lanjutkan dengan data absen kosong
                 dataAbsen = [];
             }
         }
@@ -731,7 +777,6 @@
                 absen.nip && absen.nip.toString() === currentUser.nip.toString()
             );
             
-            // Data bulan ini
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
             const absenBulanIniData = userAbsen.filter(absen => {
@@ -743,11 +788,9 @@
                 }
             });
             
-            // Update stats
             totalAbsen.textContent = absenBulanIniData.length;
             hadirCount.textContent = absenBulanIniData.length;
             
-            // Hitung hari tersisa
             const today = new Date();
             const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
             const daysLeft = lastDay.getDate() - today.getDate();
@@ -760,18 +803,15 @@
             loginSection.style.display = 'block';
             nipInput.value = '';
             loginError.style.display = 'none';
-            // Fokus ke input NIP
             setTimeout(() => nipInput.focus(), 100);
         }
 
         // Update tabel absen
         function updateAbsenTable() {
-            // Filter data absen untuk user saat ini
             const userAbsen = dataAbsen.filter(absen => 
                 absen.nip && absen.nip.toString() === currentUser.nip.toString()
             );
             
-            // Data bulan ini
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
             const absenBulanIniData = userAbsen.filter(absen => {
@@ -783,7 +823,6 @@
                 }
             });
             
-            // Isi tabel bulan ini
             absenBulanIni.innerHTML = '';
             if (absenBulanIniData.length === 0) {
                 absenBulanIni.innerHTML = `
@@ -794,9 +833,7 @@
                         </td>
                     </tr>`;
             } else {
-                // Urutkan berdasarkan tanggal (terbaru di atas)
                 absenBulanIniData.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-                
                 absenBulanIniData.forEach(absen => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -814,7 +851,6 @@
                 });
             }
             
-            // Isi tabel semua data
             absenSemua.innerHTML = '';
             if (userAbsen.length === 0) {
                 absenSemua.innerHTML = `
@@ -825,9 +861,7 @@
                         </td>
                     </tr>`;
             } else {
-                // Urutkan berdasarkan tanggal (terbaru di atas)
                 userAbsen.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-                
                 userAbsen.forEach(absen => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -859,7 +893,6 @@
         // Inisialisasi
         document.addEventListener('DOMContentLoaded', function() {
             updateTime();
-            // Fokus ke input NIP
             nipInput.focus();
         });
     </script>
