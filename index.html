@@ -3,55 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Absensi Pegawai - Real Data</title>
+    <title>Aplikasi Absensi Pegawai</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
         }
         .card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border: none;
-            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .login-container {
             max-width: 400px;
             margin: 100px auto;
         }
         .dashboard-container {
-            max-width: 900px;
-            margin: 30px auto;
+            max-width: 800px;
+            margin: 50px auto;
         }
         .profile-img {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
             display: block;
-            border: 4px solid #0d6efd;
-            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            border: 3px solid #0d6efd;
         }
         .btn-absen {
-            padding: 15px 40px;
+            padding: 12px 30px;
             font-size: 18px;
             font-weight: bold;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
-        }
-        .btn-absen:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4);
-        }
-        .btn-absen:disabled {
-            transform: none;
-            box-shadow: none;
         }
         .loading-overlay {
             position: fixed;
@@ -59,7 +43,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -68,66 +52,18 @@
             flex-direction: column;
         }
         .spinner-border {
-            width: 4rem;
-            height: 4rem;
-            border-width: 0.3em;
+            width: 3rem;
+            height: 3rem;
         }
         .table-container {
             max-height: 400px;
             overflow-y: auto;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         .nav-tabs .nav-link.active {
             font-weight: bold;
-            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
-            color: white;
-            border: none;
-            border-radius: 8px 8px 0 0;
-        }
-        .nav-tabs .nav-link {
-            border: none;
-            color: #495057;
-            font-weight: 500;
         }
         .alert-location {
             font-size: 0.9rem;
-            border-radius: 10px;
-        }
-        .card-header {
-            border-radius: 15px 15px 0 0 !important;
-            padding: 20px;
-        }
-        .stats-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 0;
-        }
-        .stats-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        #current-time {
-            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: bold;
-        }
-        .btn-logout {
-            border-radius: 20px;
-            padding: 5px 15px;
-        }
-        .info-badge {
-            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -137,48 +73,23 @@
         <div class="card">
             <div class="card-header bg-primary text-white text-center">
                 <h3><i class="fas fa-fingerprint me-2"></i>ABSENSI PEGAWAI</h3>
-                <p class="mb-0 mt-2 opacity-75">Silakan login dengan NIP Anda</p>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-info info-badge">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Mode Demo:</strong> Menggunakan data dari Google Sheets
-                </div>
-                
                 <div id="login-loading" class="text-center mb-3" style="display: none;">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <p class="mt-2">Memuat data pegawai...</p>
                 </div>
-                
                 <form id="login-form">
-                    <div class="mb-4">
-                        <label for="nip" class="form-label fw-bold">NIP</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-primary text-white">
-                                <i class="fas fa-id-card"></i>
-                            </span>
-                            <input type="text" class="form-control" id="nip" placeholder="Masukkan NIP dari Google Sheets" required>
-                        </div>
-                        <div class="form-text">
-                            Gunakan NIP yang ada di Google Sheets data pegawai
-                        </div>
+                    <div class="mb-3">
+                        <label for="nip" class="form-label">NIP</label>
+                        <input type="text" class="form-control" id="nip" placeholder="Masukkan NIP" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login
-                    </button>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
-                
                 <div id="login-error" class="alert alert-danger mt-3" style="display: none;">
                     <i class="fas fa-exclamation-triangle me-2"></i><span id="error-message"></span>
-                </div>
-                
-                <div id="data-info" class="mt-3 text-center">
-                    <small class="text-muted">
-                        <i class="fas fa-database me-1"></i>
-                        Data diambil dari: Google Sheets
-                    </small>
                 </div>
             </div>
         </div>
@@ -186,61 +97,31 @@
 
     <!-- Dashboard Section -->
     <div id="dashboard-section" class="dashboard-container" style="display: none;">
-        <!-- Header Stats -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-number" id="total-absen">0</div>
-                    <div class="stats-label">Total Absen Bulan Ini</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card" style="background: linear-gradient(135deg, #20c997, #198754);">
-                    <div class="stats-number" id="hadir-count">0</div>
-                    <div class="stats-label">Hadir</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card" style="background: linear-gradient(135deg, #fd7e14, #dc3545);">
-                    <div class="stats-number" id="tersisa-count">0</div>
-                    <div class="stats-label">Hari Tersisa</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Profile Card -->
         <div class="card mb-4">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0"><i class="fas fa-user me-2"></i>Biodata Pegawai</h4>
-                <div>
-                    <span class="badge bg-light text-dark me-2">
-                        <i class="fas fa-database me-1"></i>Live Data
-                    </span>
-                    <button id="logout-btn" class="btn btn-light btn-logout">
-                        <i class="fas fa-sign-out-alt me-1"></i>Logout
-                    </button>
-                </div>
+                <button id="logout-btn" class="btn btn-sm btn-light">Logout</button>
             </div>
             <div class="card-body">
-                <div class="row align-items-center">
+                <div class="row">
                     <div class="col-md-3 text-center">
-                        <img src="" class="profile-img" alt="Profile" id="profile-picture">
+                        <img src="https://via.placeholder.com/100" class="profile-img" alt="Profile">
                     </div>
                     <div class="col-md-9">
-                        <div class="row mb-3">
-                            <div class="col-sm-3"><strong><i class="fas fa-id-card me-2"></i>NIP:</strong></div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3"><strong>NIP:</strong></div>
                             <div class="col-sm-9" id="profile-nip">-</div>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-sm-3"><strong><i class="fas fa-user me-2"></i>Nama:</strong></div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3"><strong>Nama:</strong></div>
                             <div class="col-sm-9" id="profile-nama">-</div>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-sm-3"><strong><i class="fas fa-building me-2"></i>Department:</strong></div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3"><strong>Department:</strong></div>
                             <div class="col-sm-9" id="profile-department">-</div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-3"><strong><i class="fas fa-star me-2"></i>Level:</strong></div>
+                            <div class="col-sm-3"><strong>Level:</strong></div>
                             <div class="col-sm-9" id="profile-level">-</div>
                         </div>
                     </div>
@@ -248,15 +129,14 @@
             </div>
         </div>
 
-        <!-- Absen Card -->
         <div class="card mb-4">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Absen Hari Ini</h5>
             </div>
             <div class="card-body text-center">
-                <div id="absen-info" class="mb-4">
-                    <p id="current-time" class="h4 mb-3"></p>
-                    <div id="location-status" class="alert-location"></div>
+                <div id="absen-info" class="mb-3">
+                    <p id="current-time" class="h5"></p>
+                    <p id="location-status" class="alert-location"></p>
                 </div>
                 <button id="absen-btn" class="btn btn-success btn-absen">
                     <i class="fas fa-check-circle me-2"></i>Absen Hari Ini
@@ -270,7 +150,6 @@
             </div>
         </div>
 
-        <!-- Rekapan Absen Card -->
         <div class="card">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Rekapan Absen</h5>
@@ -278,36 +157,27 @@
             <div class="card-body">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="bulan-ini-tab" data-bs-toggle="tab" data-bs-target="#bulan-ini" type="button" role="tab">
-                            <i class="fas fa-calendar me-1"></i>Bulan Ini
-                        </button>
+                        <button class="nav-link active" id="bulan-ini-tab" data-bs-toggle="tab" data-bs-target="#bulan-ini" type="button" role="tab">Bulan Ini</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="semua-tab" data-bs-toggle="tab" data-bs-target="#semua" type="button" role="tab">
-                            <i class="fas fa-database me-1"></i>Semua Data
-                        </button>
+                        <button class="nav-link" id="semua-tab" data-bs-toggle="tab" data-bs-target="#semua" type="button" role="tab">Semua Data</button>
                     </li>
                 </ul>
                 <div class="tab-content p-3" id="myTabContent">
                     <div class="tab-pane fade show active" id="bulan-ini" role="tabpanel">
                         <div class="table-container">
-                            <table class="table table-striped table-hover">
-                                <thead class="table-primary">
+                            <table class="table table-striped">
+                                <thead>
                                     <tr>
-                                        <th><i class="fas fa-calendar me-1"></i>Tanggal</th>
-                                        <th><i class="fas fa-clock me-1"></i>Waktu</th>
-                                        <th><i class="fas fa-map-marker-alt me-1"></i>Lokasi</th>
-                                        <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                        <th>Tanggal</th>
+                                        <th>Waktu</th>
+                                        <th>Lokasi</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="absen-bulan-ini">
                                     <tr>
-                                        <td colspan="4" class="text-center py-4">
-                                            <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                            <p class="mt-2 text-muted">Memuat data absen...</p>
-                                        </td>
+                                        <td colspan="4" class="text-center">Memuat data...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -315,23 +185,18 @@
                     </div>
                     <div class="tab-pane fade" id="semua" role="tabpanel">
                         <div class="table-container">
-                            <table class="table table-striped table-hover">
-                                <thead class="table-info">
+                            <table class="table table-striped">
+                                <thead>
                                     <tr>
-                                        <th><i class="fas fa-calendar me-1"></i>Tanggal</th>
-                                        <th><i class="fas fa-clock me-1"></i>Waktu</th>
-                                        <th><i class="fas fa-map-marker-alt me-1"></i>Lokasi</th>
-                                        <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                        <th>Tanggal</th>
+                                        <th>Waktu</th>
+                                        <th>Lokasi</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="absen-semua">
                                     <tr>
-                                        <td colspan="4" class="text-center py-4">
-                                            <div class="spinner-border text-info" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                            <p class="mt-2 text-muted">Memuat data absen...</p>
-                                        </td>
+                                        <td colspan="4" class="text-center">Memuat data...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -348,7 +213,6 @@
             <span class="visually-hidden">Loading...</span>
         </div>
         <h4>Memproses Absen...</h4>
-        <p>Harap tunggu sebentar</p>
     </div>
 
     <!-- Success Overlay -->
@@ -357,23 +221,18 @@
             <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
             <h3>Absen Berhasil!</h3>
             <p>Terima kasih sudah absen hari ini</p>
-            <div class="mt-4">
-                <div class="spinner-border text-light" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // URL Google Apps Script - GANTI DENGAN URL ANDA
-        const DATA_PEGAWAI_URL = 'https://script.google.com/macros/s/AKfycbwDpE__A5B-VSX6Yng1LlVaQToM_hzMWFWQn41jGcJC5137r4t2gkAKvWbZy0yZTwo/exec';
+        // URL Google Apps Script
+        const DATA_PEGAWAI_URL = 'https://script.google.com/macros/s/AKfycbxp5mdc89XNooIw22s1iblgtbXNkqxJCEFZ3K3Dc1FVS_tQ1QrJpHFZKoMgwCfwIotaLA/exec';
         const DATA_ABSEN_URL = 'https://script.google.com/macros/s/AKfycby6cI35aYgKScfFD8ugnHb6IQjEj0wfoC45ES0BkXbLyKkTnEaLDHoj-lp0YXH9qhbB/exec';
 
         // Koordinat kantor
-        const KANTOR_LAT = -6.22494694;
-        const KANTOR_LNG = 106.814519;
+        const KANTOR_LAT = -6.22494694; // 6°13′29.809″S
+        const KANTOR_LNG = 106.814519;  // 106°48′52.269″E
         const MAX_DISTANCE = 0.2; // 200 meter
 
         // Elemen DOM
@@ -386,7 +245,6 @@
         const profileNama = document.getElementById('profile-nama');
         const profileDepartment = document.getElementById('profile-department');
         const profileLevel = document.getElementById('profile-level');
-        const profilePicture = document.getElementById('profile-picture');
         const absenBtn = document.getElementById('absen-btn');
         const currentTime = document.getElementById('current-time');
         const locationStatus = document.getElementById('location-status');
@@ -400,9 +258,6 @@
         const loginLoading = document.getElementById('login-loading');
         const loginError = document.getElementById('login-error');
         const errorMessage = document.getElementById('error-message');
-        const totalAbsen = document.getElementById('total-absen');
-        const hadirCount = document.getElementById('hadir-count');
-        const tersisaCount = document.getElementById('tersisa-count');
 
         // Variabel global
         let currentUser = null;
@@ -410,99 +265,43 @@
         let dataPegawai = [];
         let dataAbsen = [];
 
-        // ==================== SOLUSI REAL DATA ====================
-
-        // Fungsi untuk mengambil data dengan approach yang aman
+        // Fungsi untuk mengambil data dari Google Sheets
         async function fetchData(url) {
             try {
-                console.log('Mengambil data dari:', url);
-                
-                // Approach: Gunakan no-cors dan handle response secara manual
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'no-cors', // Important untuk menghindari CORS preflight
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    }
-                });
-
-                // Dengan no-cors, kita tidak bisa membaca response body
-                // Tapi request akan tetap dikirim dan Google Apps Script akan memprosesnya
-                
-                // Untuk membaca data, kita perlu approach berbeda
-                // Kita akan menggunakan teknik cache busting dan JSONP
-                return await fetchWithJSONP(url);
-                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                return data;
             } catch (error) {
-                console.error('Error fetch data:', error);
-                throw new Error('Tidak dapat terhubung ke server data');
+                console.error('Error fetching data:', error);
+                throw error;
             }
         }
 
-        // JSONP approach untuk membaca data
-        function fetchWithJSONP(url) {
-            return new Promise((resolve, reject) => {
-                const callbackName = 'callback_' + Date.now();
-                const script = document.createElement('script');
-                
-                window[callbackName] = function(data) {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    resolve(data);
-                };
-
-                script.onerror = function() {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    reject(new Error('Gagal memuat data'));
-                };
-
-                // Timeout
-                setTimeout(() => {
-                    if (window[callbackName]) {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        reject(new Error('Timeout memuat data'));
-                    }
-                }, 10000);
-
-                script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + callbackName;
-                document.body.appendChild(script);
-            });
-        }
-
-        // Fungsi untuk submit absen
+        // Fungsi untuk mengirim data absen ke Google Sheets
         async function submitAbsen(absenData) {
             try {
-                console.log('Mengirim data absen:', absenData);
-                
-                // Buat URL dengan parameter
-                const params = new URLSearchParams();
-                Object.keys(absenData).forEach(key => {
-                    params.append(key, absenData[key]);
+                const response = await fetch(DATA_ABSEN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(absenData)
                 });
                 
-                const urlWithParams = DATA_ABSEN_URL + '?' + params.toString();
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
                 
-                // Gunakan image tag untuk trigger request (no CORS issues)
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = function() {
-                        resolve({ status: 'success', message: 'Data berhasil disimpan' });
-                    };
-                    img.onerror = function() {
-                        resolve({ status: 'success', message: 'Data berhasil disimpan (offline)' });
-                    };
-                    img.src = urlWithParams;
-                });
-                
+                const result = await response.json();
+                return result;
             } catch (error) {
-                console.error('Error submit absen:', error);
-                return { status: 'success', message: 'Data berhasil disimpan' };
+                console.error('Error submitting absen:', error);
+                throw error;
             }
         }
-
-        // ==================== FUNGSI UTAMA ====================
 
         // Update waktu real-time
         function updateTime() {
@@ -514,8 +313,7 @@
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
-                second: '2-digit',
-                timeZone: 'Asia/Jakarta'
+                second: '2-digit'
             };
             currentTime.textContent = now.toLocaleDateString('id-ID', options);
         }
@@ -530,6 +328,7 @@
                             lng: position.coords.longitude
                         };
                         
+                        // Hitung jarak dari kantor
                         const distance = calculateDistance(
                             userLocation.lat, userLocation.lng,
                             KANTOR_LAT, KANTOR_LNG
@@ -545,20 +344,12 @@
                     },
                     error => {
                         console.error("Error getting location:", error);
-                        let errorMsg = 'Tidak dapat mengakses lokasi';
-                        if (error.code === error.PERMISSION_DENIED) {
-                            errorMsg = 'Izin lokasi ditolak. Silakan aktifkan izin lokasi di browser Anda.';
-                        } else if (error.code === error.POSITION_UNAVAILABLE) {
-                            errorMsg = 'Informasi lokasi tidak tersedia.';
-                        } else if (error.code === error.TIMEOUT) {
-                            errorMsg = 'Permintaan lokasi timeout.';
-                        }
-                        locationStatus.innerHTML = `<div class="alert alert-warning py-2"><i class="fas fa-exclamation-triangle me-2"></i> ${errorMsg}</div>`;
+                        locationStatus.innerHTML = `<div class="alert alert-warning py-2"><i class="fas fa-exclamation-triangle me-2"></i> Tidak dapat mengakses lokasi. Pastikan izin lokasi diaktifkan.</div>`;
                         absenBtn.disabled = true;
                     },
                     {
                         enableHighAccuracy: true,
-                        timeout: 15000,
+                        timeout: 10000,
                         maximumAge: 60000
                     }
                 );
@@ -568,9 +359,9 @@
             }
         }
 
-        // Hitung jarak
+        // Hitung jarak antara dua titik koordinat (dalam km)
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
+            const R = 6371; // Radius bumi dalam km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = 
@@ -591,35 +382,28 @@
                 return;
             }
             
+            // Tampilkan loading
             loginLoading.style.display = 'block';
             loginError.style.display = 'none';
             
             try {
-                console.log('Login dengan NIP:', nip);
-                
                 // Ambil data pegawai dari Google Sheets
                 if (dataPegawai.length === 0) {
-                    console.log('Memuat data pegawai...');
                     dataPegawai = await fetchData(DATA_PEGAWAI_URL);
-                    console.log('Data pegawai loaded:', dataPegawai);
                 }
                 
-                // Cari user
-                const user = dataPegawai.find(pegawai => {
-                    const pegawaiNip = pegawai.nip ? pegawai.nip.toString().trim() : '';
-                    return pegawaiNip === nip.toString().trim();
-                });
+                // Cari user berdasarkan NIP
+                const user = dataPegawai.find(pegawai => pegawai.nip === nip);
                 
                 if (user) {
-                    console.log('User ditemukan:', user);
                     currentUser = user;
                     await showDashboard();
                 } else {
-                    showLoginError('NIP tidak ditemukan di database');
+                    showLoginError('NIP tidak ditemukan!');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showLoginError('Gagal memuat data: ' + error.message);
+                showLoginError('Terjadi kesalahan saat memuat data. Silakan coba lagi.');
             } finally {
                 loginLoading.style.display = 'none';
             }
@@ -640,20 +424,26 @@
 
         // Proses absen
         absenBtn.addEventListener('click', async function() {
+            // Sembunyikan pesan error sebelumnya
             absenError.style.display = 'none';
             
+            // Validasi lokasi
             if (!userLocation) {
-                showAbsenError('Lokasi tidak terdeteksi');
+                showAbsenError('Lokasi tidak terdeteksi. Silakan refresh halaman dan berikan izin akses lokasi.');
                 return;
             }
             
-            const distance = calculateDistance(userLocation.lat, userLocation.lng, KANTOR_LAT, KANTOR_LNG);
+            const distance = calculateDistance(
+                userLocation.lat, userLocation.lng,
+                KANTOR_LAT, KANTOR_LNG
+            );
             
             if (distance > MAX_DISTANCE) {
-                showAbsenError(`Jarak terlalu jauh: ${(distance * 1000).toFixed(0)} m`);
+                showAbsenError(`Anda berada di luar radius absen. Jarak Anda ${(distance * 1000).toFixed(0)} m, maksimal ${MAX_DISTANCE * 1000} m.`);
                 return;
             }
             
+            // Tampilkan loading
             loadingOverlay.style.display = 'flex';
             
             try {
@@ -669,18 +459,26 @@
                     status: 'Hadir'
                 };
                 
+                // Kirim data absen ke Google Sheets
                 await submitAbsen(absenData);
                 
+                // Sembunyikan loading
                 loadingOverlay.style.display = 'none';
+                
+                // Tampilkan sukses
                 successOverlay.style.display = 'flex';
                 
+                // Tambahkan ke data absen lokal
                 dataAbsen.push(absenData);
-                updateAbsenTable();
-                updateStats();
                 
+                // Update dashboard
+                updateAbsenTable();
+                
+                // Nonaktifkan tombol absen
                 absenBtn.disabled = true;
                 absenSuccess.style.display = 'block';
                 
+                // Sembunyikan sukses setelah 3 detik
                 setTimeout(() => {
                     successOverlay.style.display = 'none';
                 }, 3000);
@@ -688,7 +486,7 @@
             } catch (error) {
                 console.error('Absen error:', error);
                 loadingOverlay.style.display = 'none';
-                showAbsenError('Gagal absen: ' + error.message);
+                showAbsenError('Gagal melakukan absen. Silakan coba lagi.');
             }
         });
 
@@ -703,27 +501,30 @@
             loginSection.style.display = 'none';
             dashboardSection.style.display = 'block';
             
-            const nameForAvatar = currentUser.nama || 'User';
-            profilePicture.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar)}&background=0D8ABC&color=fff&size=120&bold=true`;
+            // Isi profil
+            profileNip.textContent = currentUser.nip;
+            profileNama.textContent = currentUser.nama;
+            profileDepartment.textContent = currentUser.department;
+            profileLevel.textContent = currentUser.level;
             
-            profileNip.textContent = currentUser.nip || '-';
-            profileNama.textContent = currentUser.nama || '-';
-            profileDepartment.textContent = currentUser.department || '-';
-            profileLevel.textContent = currentUser.level || '-';
-            
+            // Update waktu
             updateTime();
             setInterval(updateTime, 1000);
             
+            // Cek lokasi
             checkLocation();
-            setInterval(checkLocation, 30000);
+            setInterval(checkLocation, 30000); // Cek setiap 30 detik
             
+            // Ambil data absen
             await loadAbsenData();
-            updateAbsenTable();
-            updateStats();
             
+            // Update tabel absen
+            updateAbsenTable();
+            
+            // Cek apakah sudah absen hari ini
             const today = new Date().toISOString().split('T')[0];
             const sudahAbsen = dataAbsen.some(absen => 
-                absen.nip && absen.nip.toString() === currentUser.nip.toString() && absen.tanggal === today
+                absen.nip === currentUser.nip && absen.tanggal === today
             );
             
             if (sudahAbsen) {
@@ -735,39 +536,12 @@
         // Memuat data absen
         async function loadAbsenData() {
             try {
-                console.log('Memuat data absen...');
                 dataAbsen = await fetchData(DATA_ABSEN_URL);
-                console.log('Data absen loaded:', dataAbsen);
             } catch (error) {
                 console.error('Error loading absen data:', error);
+                // Tetap lanjutkan dengan data absen kosong
                 dataAbsen = [];
             }
-        }
-
-        // Update statistics
-        function updateStats() {
-            const userAbsen = dataAbsen.filter(absen => 
-                absen.nip && absen.nip.toString() === currentUser.nip.toString()
-            );
-            
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-            const absenBulanIniData = userAbsen.filter(absen => {
-                try {
-                    const absenDate = new Date(absen.tanggal);
-                    return absenDate.getMonth() === currentMonth && absenDate.getFullYear() === currentYear;
-                } catch (e) {
-                    return false;
-                }
-            });
-            
-            totalAbsen.textContent = absenBulanIniData.length;
-            hadirCount.textContent = absenBulanIniData.length;
-            
-            const today = new Date();
-            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            const daysLeft = lastDay.getDate() - today.getDate();
-            tersisaCount.textContent = Math.max(0, daysLeft);
         }
 
         // Tampilkan login
@@ -776,77 +550,50 @@
             loginSection.style.display = 'block';
             nipInput.value = '';
             loginError.style.display = 'none';
-            setTimeout(() => nipInput.focus(), 100);
         }
 
         // Update tabel absen
         function updateAbsenTable() {
-            const userAbsen = dataAbsen.filter(absen => 
-                absen.nip && absen.nip.toString() === currentUser.nip.toString()
-            );
+            // Filter data absen untuk user saat ini
+            const userAbsen = dataAbsen.filter(absen => absen.nip === currentUser.nip);
             
+            // Data bulan ini
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
             const absenBulanIniData = userAbsen.filter(absen => {
-                try {
-                    const absenDate = new Date(absen.tanggal);
-                    return absenDate.getMonth() === currentMonth && absenDate.getFullYear() === currentYear;
-                } catch (e) {
-                    return false;
-                }
+                const absenDate = new Date(absen.tanggal);
+                return absenDate.getMonth() === currentMonth && absenDate.getFullYear() === currentYear;
             });
             
+            // Isi tabel bulan ini
             absenBulanIni.innerHTML = '';
             if (absenBulanIniData.length === 0) {
-                absenBulanIni.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center py-4 text-muted">
-                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                            Tidak ada data absen bulan ini
-                        </td>
-                    </tr>`;
+                absenBulanIni.innerHTML = '<tr><td colspan="4" class="text-center">Tidak ada data absen bulan ini</td></tr>';
             } else {
-                absenBulanIniData.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
                 absenBulanIniData.forEach(absen => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(absen.tanggal)}</td>
-                        <td>${absen.waktu || '-'}</td>
-                        <td>
-                            <small>
-                                <i class="fas fa-map-marker-alt me-1 text-muted"></i>
-                                ${absen.lokasi || 'Tidak tercatat'}
-                            </small>
-                        </td>
-                        <td><span class="badge bg-success">${absen.status || 'Hadir'}</span></td>
+                        <td>${absen.waktu}</td>
+                        <td>${absen.lokasi}</td>
+                        <td><span class="badge bg-success">${absen.status}</span></td>
                     `;
                     absenBulanIni.appendChild(row);
                 });
             }
             
+            // Isi tabel semua data
             absenSemua.innerHTML = '';
             if (userAbsen.length === 0) {
-                absenSemua.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center py-4 text-muted">
-                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                            Tidak ada data absen
-                        </td>
-                    </tr>`;
+                absenSemua.innerHTML = '<tr><td colspan="4" class="text-center">Tidak ada data absen</td></tr>';
             } else {
-                userAbsen.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
                 userAbsen.forEach(absen => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(absen.tanggal)}</td>
-                        <td>${absen.waktu || '-'}</td>
-                        <td>
-                            <small>
-                                <i class="fas fa-map-marker-alt me-1 text-muted"></i>
-                                ${absen.lokasi || 'Tidak tercatat'}
-                            </small>
-                        </td>
-                        <td><span class="badge bg-success">${absen.status || 'Hadir'}</span></td>
+                        <td>${absen.waktu}</td>
+                        <td>${absen.lokasi}</td>
+                        <td><span class="badge bg-success">${absen.status}</span></td>
                     `;
                     absenSemua.appendChild(row);
                 });
@@ -855,19 +602,12 @@
 
         // Format tanggal
         function formatDate(dateString) {
-            try {
-                const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-                return new Date(dateString).toLocaleDateString('id-ID', options);
-            } catch (e) {
-                return dateString;
-            }
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
         }
 
         // Inisialisasi
-        document.addEventListener('DOMContentLoaded', function() {
-            updateTime();
-            nipInput.focus();
-        });
+        updateTime();
     </script>
 </body>
 </html>
